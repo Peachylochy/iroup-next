@@ -41,9 +41,15 @@ forms, rules, permissions, and reports for each category.
 - `agreements`: one agreement lifecycle
 - `agreement_partners`: supports bilateral and multilateral agreements
 - `agreement_units`: UP owners and participating units
+- `partner_contacts`: private people associated with partner organizations
+- `partner_contact_methods`: multiple email, phone, messaging, and social
+  methods per contact
+- `partner_contact_interactions`: meeting/contact history optionally linked to
+  an agreement or movement case
 
 Public output contains agreement identity, partner, country, responsible unit,
-period, and public status only.
+period, and public status only. Partner contact records have no public view and
+no anonymous database grant.
 
 ### International Movement
 
@@ -107,6 +113,20 @@ upload -> parse -> normalize -> validate -> review -> commit -> audit
 
 Rows are never written directly into production tables during preview.
 
+The foreign-contact workbook maps as follows:
+
+| Workbook field | Target |
+| --- | --- |
+| Organization, country, organization type | `partner_organizations` |
+| Name, position, department/field, relationship level, note | `partner_contacts` |
+| Email and phone | `partner_contact_methods` |
+| Encounter/travel and latest contact date | `partner_contact_interactions` |
+
+Organization matching uses normalized organization name plus country. A row
+that cannot be matched confidently remains in import review; it is not merged
+automatically. Buddhist Era dates are converted to Gregorian dates only when
+the source value is valid.
+
 ### Audit and reporting
 
 - `private.audit_logs`: append-only change evidence
@@ -132,6 +152,8 @@ Rows are never written directly into production tables during preview.
 ```text
 ภาพรวม
 ความร่วมมือและ MOU
+  - องค์กรคู่ความร่วมมือ
+  - ผู้ติดต่อองค์กรต่างประเทศ (ภายใน)
 การเดินทางและ Mobility
   - ภาพรวมการเคลื่อนย้าย
   - Mobility นิสิต

@@ -26,7 +26,8 @@ Scope: the complete internal workspace and public portal
 
 ## Modules
 
-- `mou`: agreements, partner organizations, milestones, and agreement files
+- `mou`: agreements, partner organizations, private partner contacts,
+  interaction history, milestones, and agreement files
 - `mobility`: student and staff mobility, inbound and outbound
 - `travel`: official staff travel
 - `scholarship`: scholarship opportunities
@@ -57,6 +58,7 @@ Each user can receive these actions per module:
 | Read published public-safe records | Yes | Yes | Yes | Yes | Yes | Yes |
 | Read internal records | No | No | Assigned | Assigned | All | All |
 | Read person-level data | No | No | Assigned | Assigned | All | All |
+| Read foreign partner contacts | No | No | MOU only | MOU only | Yes | Yes |
 | Create records | No | No | No | Assigned | All | All |
 | Update drafts | No | No | No | Assigned | All | All |
 | Publish or unpublish | No | No | No | Explicit grant | All | All |
@@ -83,6 +85,16 @@ receiving access to official staff travel records or internal funding.
 Editors without `publish` permission cannot create a published record, change a
 draft to published, unpublish an existing record, or modify an already published
 record. Public content always passes a deliberate review boundary.
+
+## Foreign partner contact privacy
+
+- Contact names, positions, direct contact methods, interaction history, and
+  internal notes are never granted to `anon`.
+- An authenticated user must also have `mou.view`; sign-in alone is not enough.
+- Create, update, delete, and import remain separate MOU permissions.
+- Partner organizations may be public when used by a published agreement, but
+  their contact people and communication details remain internal.
+- No real contact record is committed to the public GitHub repository.
 
 ## Bootstrap rule
 

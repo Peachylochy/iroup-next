@@ -35,7 +35,7 @@ select results_eq(
       and relkind = 'r'
       and relrowsecurity
   $$,
-  array[21::bigint],
+  array[24::bigint],
   'RLS is enabled on every public base table'
 );
 

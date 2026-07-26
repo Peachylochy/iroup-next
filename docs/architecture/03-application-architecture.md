@@ -90,6 +90,7 @@ src/
     ui/
   features/
     agreements/
+    partner-contacts/
     movements/
     scholarships/
     events/
@@ -106,3 +107,11 @@ src/
 
 Feature modules own their queries, schemas, forms, and domain components.
 Generic UI components do not contain domain rules.
+
+## Private partner contact route
+
+`/(workspace)/partnerships/contacts` is rendered only for users with
+`mou.view`. It is absent from the public route group and from public search.
+Its list, export, and detail queries use the caller's Supabase session so RLS
+applies consistently. Imports use the shared preview/review/commit pipeline;
+raw contact files and row payloads are never committed to source control.

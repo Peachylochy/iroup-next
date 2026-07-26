@@ -17,6 +17,18 @@ The active user sees only modules they can access.
 The same shell is reused for MOU, movement categories, scholarships, events,
 news, and knowledge. Columns and filters remain domain-specific.
 
+### Private foreign contacts
+
+- Located under `ความร่วมมือและ MOU > ผู้ติดต่อองค์กรต่างประเทศ`
+- Internal-only badge and access-denied state are always visible where relevant.
+- Default columns: contact, organization, country, position, primary methods,
+  relationship level, and latest contact date.
+- Filters: country, continent, organization type, field/topic, relationship
+  level, active state, and follow-up status.
+- Contact detail separates profile, contact methods, interaction timeline,
+  linked MOU/movement records, follow-up, and internal notes.
+- Export requires MOU access and must never be available on the public portal.
+
 ## Standard create/edit screen
 
 1. Record identity and workflow status
