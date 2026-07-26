@@ -26,16 +26,19 @@ export const navigationGroups = [
     label: "ความร่วมมือและ MOU",
     href: "#module-overview",
     icon: Handshake,
+    module: "mou",
     children: [
       {
         label: "องค์กรคู่ความร่วมมือ",
         href: "#module-overview",
         icon: UsersRound,
+        module: "mou",
       },
       {
         label: "ผู้ติดต่อองค์กรต่างประเทศ",
         href: "#module-overview",
         icon: ContactRound,
+        module: "mou",
         internal: true,
       },
     ],
@@ -44,21 +47,25 @@ export const navigationGroups = [
     label: "การเดินทางและ Mobility",
     href: "#priority-work",
     icon: Plane,
+    module: "mobility",
     children: [
       {
         label: "Mobility นิสิต",
         href: "#module-overview",
         icon: GraduationCap,
+        module: "mobility",
       },
       {
         label: "Mobility บุคลากร",
         href: "#module-overview",
         icon: UsersRound,
+        module: "mobility",
       },
       {
         label: "เดินทางไปปฏิบัติงาน",
         href: "#module-overview",
         icon: BriefcaseBusiness,
+        module: "travel",
       },
     ],
   },
@@ -66,12 +73,33 @@ export const navigationGroups = [
     label: "ทุนการศึกษา",
     href: "#activity",
     icon: GraduationCap,
+    module: "scholarship",
   },
-  { label: "กิจกรรม", href: "#activity", icon: CalendarDays },
-  { label: "ข่าวประชาสัมพันธ์", href: "#activity", icon: Megaphone },
-  { label: "คลังความรู้", href: "#activity", icon: BookOpenText },
-  { label: "รายงาน", href: "#module-overview", icon: MapPinned },
-  { label: "ตั้งค่าระบบ", href: "#main", icon: Settings },
+  {
+    label: "กิจกรรม",
+    href: "#activity",
+    icon: CalendarDays,
+    module: "events",
+  },
+  {
+    label: "ข่าวประชาสัมพันธ์",
+    href: "#activity",
+    icon: Megaphone,
+    module: "news",
+  },
+  {
+    label: "คลังความรู้",
+    href: "#activity",
+    icon: BookOpenText,
+    module: "knowledge",
+  },
+  {
+    label: "รายงาน",
+    href: "#module-overview",
+    icon: MapPinned,
+    module: "reports",
+  },
+  { label: "ตั้งค่าระบบ", href: "#main", icon: Settings, module: "settings" },
 ] as const;
 
 export const priorityItems = [
@@ -116,6 +144,7 @@ export const priorityItems = [
 export const moduleSummaries = [
   {
     label: "ความร่วมมือและ MOU",
+    module: "mou",
     value: 124,
     unit: "ฉบับ",
     detail: "ใช้งานอยู่ 78 · ใกล้หมดอายุ 18",
@@ -123,6 +152,7 @@ export const moduleSummaries = [
   },
   {
     label: "Mobility",
+    module: "mobility",
     value: 156,
     unit: "รายการ",
     detail: "กำลังดำเนินการ 68 · เสร็จสิ้นแล้ว 88",
@@ -130,6 +160,7 @@ export const moduleSummaries = [
   },
   {
     label: "เดินทางไปปฏิบัติงาน",
+    module: "travel",
     value: 64,
     unit: "รายการ",
     detail: "รอดำเนินการ 21 · เสร็จสิ้นแล้ว 43",
@@ -137,6 +168,7 @@ export const moduleSummaries = [
   },
   {
     label: "ผู้ติดต่อองค์กรต่างประเทศ",
+    module: "mou",
     value: 58,
     unit: "ราย",
     detail: "18 ประเทศ · ข้อมูลภายในเท่านั้น",
@@ -210,8 +242,13 @@ export const upcomingItems = [
 ] as const;
 
 export const quickCreateItems = [
-  { label: "เพิ่ม MOU", icon: Handshake },
-  { label: "เพิ่ม Mobility", icon: GraduationCap },
-  { label: "เพิ่มการเดินทาง", icon: Plane },
-  { label: "เพิ่มผู้ติดต่อ", icon: ContactRound, internal: true },
+  { label: "เพิ่ม MOU", icon: Handshake, module: "mou" },
+  { label: "เพิ่ม Mobility", icon: GraduationCap, module: "mobility" },
+  { label: "เพิ่มการเดินทาง", icon: Plane, module: "travel" },
+  {
+    label: "เพิ่มผู้ติดต่อ",
+    icon: ContactRound,
+    module: "mou",
+    internal: true,
+  },
 ] as const;

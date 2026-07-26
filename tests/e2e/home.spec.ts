@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 
 test("renders the task-first iROUP operations dashboard", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/preview");
 
   await expect(page).toHaveTitle(/iROUP Portal/);
   await expect(
@@ -21,7 +21,7 @@ test("renders the task-first iROUP operations dashboard", async ({ page }) => {
 });
 
 test("search and quick-add controls update the dashboard", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/preview");
 
   const search = page.getByRole("searchbox", { name: /ค้นหาข้อมูล/ });
   await search.fill("MOU");
@@ -40,7 +40,7 @@ test("mobile navigation opens and preserves the internal contact label", async (
   page,
 }) => {
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto("/");
+  await page.goto("/preview");
 
   await page.getByRole("button", { name: "เปิดเมนู" }).click();
   const mobileNav = page.getByRole("complementary", {
@@ -55,4 +55,32 @@ test("mobile navigation opens and preserves the internal contact label", async (
 
   await mobileNav.getByRole("button", { name: "ปิดเมนู" }).click();
   await expect(mobileNav).toHaveCount(0);
+});
+
+test("unauthenticated users are redirected to the staff sign-in page", async ({
+  page,
+}) => {
+  await page.goto("/");
+
+  await expect(page).toHaveURL(/\/login\?next=%2F$/);
+  await expect(
+    page.getByRole("heading", { level: 1, name: "เข้าสู่ระบบ" }),
+  ).toBeVisible();
+  await expect(page.getByLabel("อีเมล")).toBeVisible();
+  await expect(page.locator('input[name="password"]')).toBeVisible();
+});
+
+test("staff can switch to the protected account registration form", async ({
+  page,
+}) => {
+  await page.goto("/login");
+  await page.getByRole("button", { name: "สร้างบัญชี" }).click();
+
+  await expect(
+    page.getByRole("heading", { level: 1, name: "สร้างบัญชีเจ้าหน้าที่" }),
+  ).toBeVisible();
+  await expect(page.getByLabel("ชื่อที่แสดงในระบบ")).toBeVisible();
+  await expect(
+    page.getByText(/บัญชีใหม่จะยังใช้งานไม่ได้จนกว่าผู้ดูแลจะอนุมัติสิทธิ์/),
+  ).toBeVisible();
 });

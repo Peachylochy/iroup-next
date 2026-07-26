@@ -1,36 +1,55 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# iROUP Next
 
-## Getting Started
+ระบบบริหารงานวิเทศสัมพันธ์ มหาวิทยาลัยพะเยา สร้างด้วย Next.js App Router และ
+Supabase
 
-First, run the development server:
+## Platform
+
+- Next.js 16 + React 19
+- Supabase Auth, PostgreSQL, RLS และ Storage
+- shadcn/ui + Base UI
+- Vitest, Playwright และ pgTAP
+
+## Local development
+
+คัดลอก `.env.example` เป็น `.env.local` แล้วกำหนด Project URL และ publishable
+key ของ Supabase จากนั้นรัน:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
+pnpm install
 pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+เปิด <http://localhost:3000>
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Database workflow
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+pnpm supabase:start
+pnpm exec supabase db reset --local --yes
+pnpm supabase:test
+```
 
-## Learn More
+ทุก migration ต้องผ่าน pgTAP และ database lint ก่อนนำขึ้น production
 
-To learn more about Next.js, take a look at the following resources:
+## Authentication and permissions
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- ผู้ใช้ใหม่สมัครด้วยอีเมลและรหัสผ่าน
+- บัญชีใหม่เห็นเฉพาะหน้ารออนุมัติ จนกว่าจะได้รับบทบาทหรือสิทธิ์โมดูล
+- เมนู การอ่านข้อมูล และการแก้ไขข้อมูลอิงสิทธิ์เดียวกันจาก PostgreSQL
+- ผู้ดูแลระบบคนแรกต้องมอบสิทธิ์ด้วยขั้นตอน bootstrap ฝั่งฐานข้อมูล
+- ห้ามใช้ `user_metadata` เป็นแหล่งตัดสินสิทธิ์
+- ห้ามนำ secret key หรือ service-role key ไปไว้ใน browser หรือ GitHub
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+รายละเอียดการออกแบบอยู่ใน [docs/architecture](docs/architecture)
 
-## Deploy on Vercel
+## Verification
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+pnpm lint
+pnpm typecheck
+pnpm test
+pnpm build
+pnpm test:e2e
+pnpm supabase:test
+```
