@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState, useState } from "react";
-import { Eye, EyeOff, LockKeyhole, Mail, UserRound } from "lucide-react";
+import { Eye, EyeOff } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -76,7 +76,6 @@ export function AuthForm() {
           <label>
             <span>ชื่อที่แสดงในระบบ</span>
             <span className="auth-field">
-              <UserRound aria-hidden="true" />
               <Input
                 name="displayName"
                 autoComplete="name"
@@ -90,7 +89,6 @@ export function AuthForm() {
         <label>
           <span>อีเมล</span>
           <span className="auth-field">
-            <Mail aria-hidden="true" />
             <Input
               name="email"
               type="email"
@@ -104,7 +102,6 @@ export function AuthForm() {
         <label>
           <span>รหัสผ่าน</span>
           <span className="auth-field">
-            <LockKeyhole aria-hidden="true" />
             <Input
               name="password"
               type={showPassword ? "text" : "password"}

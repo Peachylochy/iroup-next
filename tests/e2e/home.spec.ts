@@ -80,6 +80,7 @@ test("staff can switch to the protected account registration form", async ({
     page.getByRole("heading", { level: 1, name: "สร้างบัญชีเจ้าหน้าที่" }),
   ).toBeVisible();
   await expect(page.getByLabel("ชื่อที่แสดงในระบบ")).toBeVisible();
+  await expect(page.locator(".auth-field > svg")).toHaveCount(0);
   await expect(
     page.getByText(/บัญชีใหม่จะยังใช้งานไม่ได้จนกว่าผู้ดูแลจะอนุมัติสิทธิ์/),
   ).toBeVisible();

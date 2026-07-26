@@ -1293,19 +1293,14 @@
     align-items: center;
   }
 
-  .auth-field > svg {
-    position: absolute;
-    left: 13px;
-    z-index: 1;
-    width: 17px;
-    color: var(--muted-foreground);
-  }
-
   .auth-field input {
     height: 46px;
-    padding-left: 40px;
-    padding-right: 42px;
+    padding-inline: 13px;
     font-size: 13px;
+  }
+
+  .auth-field:has(.password-toggle) input {
+    padding-right: 46px;
   }
 
   .password-toggle {
