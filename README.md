@@ -1,5 +1,8 @@
 # iROUP Next
 
+สถานะล่าสุดและจุดเริ่มงานครั้งถัดไปอยู่ที่
+[docs/PROJECT_STATE.md](docs/PROJECT_STATE.md)
+
 ระบบบริหารงานวิเทศสัมพันธ์ มหาวิทยาลัยพะเยา สร้างด้วย Next.js App Router และ
 Supabase
 
