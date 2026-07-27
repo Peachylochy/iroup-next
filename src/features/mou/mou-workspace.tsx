@@ -108,7 +108,7 @@ export function MouWorkspace({ access, agreements, viewer }: Props) {
             </p>
           </div>
           {canCreate ? (
-            <Button size="lg" render={<Link href="/mou/new" />}>
+            <Button nativeButton={false} size="lg" render={<Link href="/mou/new" />}>
               <Plus data-icon="inline-start" />
               เพิ่ม MOU
             </Button>
@@ -192,7 +192,12 @@ export function MouWorkspace({ access, agreements, viewer }: Props) {
                     {statusLabels[agreement.status]}
                   </Badge>
                   {canUpdate ? (
-                    <Button variant="outline" size="sm" render={<Link href={`/mou/${agreement.id}/edit`} />}>
+                    <Button
+                      nativeButton={false}
+                      variant="outline"
+                      size="sm"
+                      render={<Link href={`/mou/${agreement.id}/edit`} />}
+                    >
                       แก้ไข
                     </Button>
                   ) : null}
