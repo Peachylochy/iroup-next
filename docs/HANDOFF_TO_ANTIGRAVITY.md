@@ -1,9 +1,9 @@
 # iROUP Next — Handoff to Antigravity
 
 อัปเดต: 27 กรกฎาคม 2569  
-Branch: `agent/mou-app-shell`  
-Latest commit: `d35440e Align MOU form with approved legacy matrix`  
-PR: `https://github.com/Peachylochy/iroup-next/pull/2`
+Branch: `main`  
+Latest commit: `1743eb5 Merge pull request #2 from Peachylochy/agent/mou-app-shell`  
+Merged PR: `https://github.com/Peachylochy/iroup-next/pull/2`
 
 ## เริ่มจากตรงนี้
 
@@ -16,7 +16,7 @@ MOU เป็นโมดูลแรกที่กำลัง build ตาม
 - องค์กรคู่ความร่วมมือ: `http://localhost:3000/mou/organizations`
 - Supabase project: `iroup-next` (`fefxzaxlfocqeuicjevv`)
 
-ก่อนแก้ไขใด ๆ ให้ตรวจ `git status`, `supabase migration list` และ PR #2 ก่อน
+ก่อนแก้ไขใด ๆ ให้ตรวจ `git status`, `git pull --ff-only origin main` และ `supabase migration list` ก่อน
 
 ## สิ่งที่ทำเสร็จและยืนยันแล้ว
 
@@ -40,13 +40,16 @@ MOU เป็นโมดูลแรกที่กำลัง build ตาม
 
 ### Migration ล่าสุด
 
-`supabase/migrations/20260727075135_mou_legacy_field_contract.sql` ถูก apply ทั้ง local และ remote แล้ว
+Migrations ล่าสุดถูก apply ทั้ง local และ remote แล้ว:
 
+- `20260727075135_mou_legacy_field_contract`
 - partner/country snapshots และ country source/override contract
 - fiscal-year trigger
 - review/publish validation ที่เข้มขึ้น
 - MOU attachment metadata ไม่ให้ anon เห็น
 - RPC `mou_soft_delete` และ `mou_restore`
+- `20260727084026_remove_mou_file_retention`
+- ยืนยันว่าไม่มี automatic file purge หรือ deadline สำหรับ restore
 
 ## เอกสารที่ต้องยึด
 
@@ -89,7 +92,7 @@ pnpm.cmd exec supabase db advisors
 - pgTAP: 17/17 ผ่าน
 - ESLint / TypeScript / production build: ผ่าน
 - Local และ remote DB advisor: ไม่พบ issue
-- Remote migration list มีถึง `20260727075135`
+- Remote migration list มีถึง `20260727084026`
 
 ## ความปลอดภัยและขอบเขต
 

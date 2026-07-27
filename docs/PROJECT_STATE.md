@@ -32,6 +32,8 @@ iROUP Next เป็นระบบใหม่ที่พัฒนาด้ว
   ผ่าน Security Invoker wrapper
 - ตรวจ Responsive layout สำหรับ Desktop และ Mobile
 - Merge PR #1 เข้า `main` สำเร็จด้วย merge commit `1dcfb4a`
+- Merge PR #2 (App Shell, MOU, partner organization และ legacy matrix) เข้า `main`
+  สำเร็จด้วย merge commit `1743eb5`
 - เพิ่ม shared App Shell components สำหรับ Sidebar และ Workspace Chrome
 - เพิ่มหน้า `/mou` สำหรับรายการ MOU พร้อมค้นหา กรองสถานะ และ empty state
 - เพิ่ม MOU write workflow: ร่าง → รอตรวจสอบ → มีผลบังคับใช้/เผยแพร่
@@ -85,16 +87,15 @@ iROUP Next เป็นระบบใหม่ที่พัฒนาด้ว
 ## GitHub
 
 - Repository: `Peachylochy/iroup-next`
-- Main includes PR #1 merge commit: `1dcfb4a Add secure user permission management`
-- Current feature branch: `agent/mou-app-shell`
-- Current work: MOU form foundation ตาม legacy matrix เสร็จ; เริ่ม MOU detail/attachments ต่อ
+- Main includes PR #1 `1dcfb4a` and PR #2 `1743eb5`
+- Current branch: `main`
+- Current work: MOU form foundation ตาม legacy matrix เสร็จ; งานถัดไปคือ MOU detail/attachments
 
 ## จุดเริ่มงานครั้งถัดไป
 
-1. ตรวจและ Merge PR ของ App Shell/MOU workflow เข้า `main`
-2. เพิ่ม MOU detail และ attachment management แบบข้อมูลภายใน
-3. ทำ list/filter/export ให้ครบก่อน map/analytics
-4. ทำ matrix ของ Mobility ก่อนเริ่มพัฒนา Mobility module
+1. เพิ่ม MOU detail และ attachment management แบบข้อมูลภายใน
+2. ทำ list/filter/export ให้ครบก่อน map/analytics
+3. ทำ matrix ของ Mobility ก่อนเริ่มพัฒนา Mobility module
 
 ## ข้อควรจำ
 
