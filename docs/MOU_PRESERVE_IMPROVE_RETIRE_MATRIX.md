@@ -17,6 +17,15 @@ Baseline: `docs/LEGACY_FUNCTION_INVENTORY.md`, legacy `Team IROUP/mou.html`, V2 
 - ผู้ติดต่อองค์กรต่างประเทศเป็นข้อมูลภายใน ไม่อยู่ใน public portal
 - ระบบใหม่ยังไม่ตัด capability ของระบบเดิมเพียงเพราะยังไม่มีในหน้าปัจจุบัน
 
+## ข้อสรุปที่ยืนยันแล้ว
+
+| เรื่อง | ข้อสรุป |
+|---|---|
+| วันสิ้นสุด | ไม่บังคับ เพราะ MOU บางฉบับไม่มีวันหมดอายุ; ถ้ากรอกต้องไม่น้อยกว่าวันเริ่ม |
+| คู่สัญญา | รองรับหลายองค์กร และต้องกำหนดองค์กรหลัก (`lead`) เพียงหนึ่งองค์กร |
+| ประเทศของ MOU | ดึงจากองค์กร master โดยอัตโนมัติ และเก็บ country snapshot/override พร้อมเหตุผลเพื่อรักษาประวัติย้อนหลัง |
+| ไฟล์ MOU | เก็บเป็นข้อมูลภายในเท่านั้น; ไม่มีการเผยแพร่ไฟล์ MOU ใน public portal |
+
 ## Matrix ความสามารถ
 
 | # | ความสามารถเดิม | การตัดสินใจ | เป้าหมายระบบใหม่ / ข้อกำหนด |
@@ -32,12 +41,12 @@ Baseline: `docs/LEGACY_FUNCTION_INVENTORY.md`, legacy `Team IROUP/mou.html`, V2 
 | 9 | เพิ่ม, แก้ไข, ลบ MOU | ปรับปรุง | Draft/review/publish, optimistic concurrency, soft delete และ audit timeline; ไม่ให้ browser เขียนหลายตารางตรง ๆ |
 | 10 | หน่วยงานเจ้าของ (`up_unit_id`) | คงไว้ | ต้องมี owner unit หนึ่งหน่วยงานเมื่อส่งตรวจ; รองรับหน่วยงานเกี่ยวข้องหลายหน่วยงานใน relation แยกต่างหาก |
 | 11 | ชื่อองค์กรไทย/อังกฤษที่พิมพ์ในฟอร์ม | ปรับปรุง | เลือกจาก master organization เป็นหลัก; สร้างองค์กรขั้นต่ำ inline ได้ และเก็บ snapshot ชื่อ ณ วันทำ MOU เพื่อไม่ให้ประวัติเปลี่ยนตาม master |
-| 12 | ประเทศ/ทวีปในฟอร์ม | ปรับปรุง | ประเทศเป็นข้อมูลขององค์กร master แต่ MOU ต้องเก็บ country snapshot/override พร้อมเหตุผลเมื่อข้อมูลในหนังสือไม่ตรง master |
+| 12 | ประเทศ/ทวีปในฟอร์ม | ปรับปรุง | ประเทศดึงจากองค์กร master และเก็บ country snapshot/override พร้อมเหตุผลเมื่อข้อมูลในหนังสือไม่ตรง master |
 | 13 | ประเภท MOU/MOA | คงไว้ | ใช้ controlled value และรองรับ subtype ที่เพิ่มภายหลังโดยไม่ต้องแก้ UI หลัก |
 | 14 | ปีงบประมาณคำนวณจากวันเริ่ม | ปรับปรุง | คำนวณอัตโนมัติตามปีงบประมาณไทยจากวันเริ่ม; แสดงผลให้ตรวจและบันทึกค่า snapshot |
 | 15 | สถานะ active/expired/cancelled | ปรับปรุง | ผู้สร้างเลือก lifecycle ไม่ได้; publish/terminate/archive เป็น action ตามสิทธิ์และทุก transition มีเหตุผล/audit |
 | 16 | `public_visible` | ปรับปรุง | ตั้งได้ในขั้น publish เท่านั้น; public query เห็นเฉพาะ MOU ที่ published + active + visible |
-| 17 | `public_file_allowed` | ปรับปรุง | ไฟล์เป็น internal by default; ระบุ visibility ต่อไฟล์และใช้ signed URL สำหรับไฟล์ private |
+| 17 | `public_file_allowed` | เลิกใช้ | ไฟล์ MOU เป็น internal เท่านั้น; ใช้ signed URL สำหรับผู้มีสิทธิ์ดูภายใน |
 | 18 | แนบไฟล์, ดูชื่อ, เปิดไฟล์, ล้าง pending file | คงไว้ | Attachment area มี upload queue, role, size/type validation, preview metadata, remove pending และ audit |
 | 19 | เปิดไฟล์ public แต่ปิด download | เลิกใช้ในความหมายเดิม | Browser ป้องกันการดาวน์โหลดไฟล์ที่แสดงได้จริงไม่ได้; ถ้าห้ามดาวน์โหลด ต้องไม่เผยไฟล์ต้นฉบับ และเผยแพร่เฉพาะ metadata/preview ที่อนุมัติ |
 | 20 | เปิดรายละเอียด MOU | ปรับปรุง | Detail เป็นศูนย์กลาง: ข้อมูลสัญญา, partners/units, files, public state, lifecycle และ timeline |
@@ -60,14 +69,14 @@ Baseline: `docs/LEGACY_FUNCTION_INVENTORY.md`, legacy `Team IROUP/mou.html`, V2 
 
 - ชื่อ MOU, ประเภท, owner unit, partner หลัก, ประเทศของ MOU, วันเริ่ม และปีงบประมาณต้องครบ
 - ตรวจเลขที่ MOU ซ้ำ, ความสัมพันธ์ของวัน, และข้อมูลองค์กรก่อนส่ง
+- วันสิ้นสุดไม่บังคับ; หากกรอกต้องไม่น้อยกว่าวันเริ่ม
 - MOU ที่ partner ยัง `pending_verification` ส่งตรวจได้ แต่ publish ไม่ได้จนกว่าจะตรวจองค์กรเสร็จ
 - มีไฟล์ฉบับลงนามหรือไม่เป็นกติกา publish (ไม่บังคับใน draft)
 
 ### Publish / public
 
 - ผู้มีสิทธิ์ publish เท่านั้นดำเนินการได้
-- ต้องระบุว่าจะ public เฉพาะ metadata หรือมีไฟล์ที่เปิดเผยได้
-- public payload ไม่คืนข้อมูลผู้ติดต่อองค์กร, internal note, audit detail หรือไฟล์ private
+- public payload ไม่คืนข้อมูลผู้ติดต่อองค์กร, internal note, audit detail หรือไฟล์ MOU
 
 ## สิทธิ์และผลที่ผู้ใช้เห็น
 
@@ -90,15 +99,11 @@ Baseline: `docs/LEGACY_FUNCTION_INVENTORY.md`, legacy `Team IROUP/mou.html`, V2 
 4. **List + export** — filter ครบ, lifecycle derived status, CSV/XLSX
 5. **Analytics + public** — KPI, dashboard alert, unit chart, map และ public DTO
 
-## จุดที่ต้องยืนยันก่อนเริ่มแก้ form/migration
+## จุดที่ยังต้องยืนยันก่อนเริ่มแก้ form/migration
 
-1. **วันสิ้นสุด** — ระบบเก่าบังคับกรอก; แนะนำให้ยังบังคับเมื่อส่งตรวจ แต่ draft เว้นได้. ยอมให้ MOU ไม่มีวันสิ้นสุดหรือไม่?
-2. **คู่สัญญาหลายองค์กร** — schema ใหม่รองรับหลายองค์กร; แนะนำให้มีได้หลายรายแต่ต้องมี `lead` เดียว. ยืนยันหรือให้จำกัดหนึ่งองค์กรเหมือนฟอร์มเก่า?
-3. **หน่วยงาน ม.พะเยา** — แนะนำให้มี owner เดียวและหน่วยงานเกี่ยวข้องหลายหน่วยงาน. ยืนยันหรือให้มี owner หลายหน่วยงาน?
-4. **ประเทศของ MOU** — แนะนำให้ดึงจากองค์กร master แต่เก็บ snapshot/override พร้อมเหตุผล. ยืนยันหรือให้แก้ได้เฉพาะใน master organization?
-5. **ไฟล์ public** — แนะนำให้ public เฉพาะ metadata เป็นค่าเริ่มต้น; การเผยไฟล์ต้องเลือกต่อไฟล์. ยืนยันหรือมีประเภทไฟล์ใดที่ต้อง public โดยปริยาย?
-6. **การลบ** — แนะนำ soft delete และ restore ได้เฉพาะ System Admin. ระยะเก็บก่อนลบถาวรต้องกำหนดหรือไม่?
-7. **Map/กราฟหน่วยงาน** — แนะนำทำใน phase analytics หลังงานบันทึก/ไฟล์/list complete. ยืนยันลำดับนี้หรือเป็น requirement รอบแรก?
+1. **หน่วยงาน ม.พะเยา** — แนะนำให้มี owner เดียวและหน่วยงานเกี่ยวข้องหลายหน่วยงาน. ยืนยันหรือให้มี owner หลายหน่วยงาน?
+2. **การลบ** — แนะนำ soft delete และ restore ได้เฉพาะ System Admin. ระยะเก็บก่อนลบถาวรต้องกำหนดหรือไม่?
+3. **Map/กราฟหน่วยงาน** — แนะนำทำใน phase analytics หลังงานบันทึก/ไฟล์/list complete. ยืนยันลำดับนี้หรือเป็น requirement รอบแรก?
 
-> เมื่อทั้ง 7 ข้อได้รับคำตอบ ฉันจะเปลี่ยนเอกสารนี้เป็น implementation checklist
+> เมื่อทั้ง 3 ข้อได้รับคำตอบ ฉันจะเปลี่ยนเอกสารนี้เป็น implementation checklist
 > และเริ่ม migration/tests ก่อน แล้วจึงแก้ form MOU ตามที่อนุมัติเท่านั้น.
