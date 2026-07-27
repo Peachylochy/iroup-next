@@ -1363,6 +1363,7 @@
   .mou-form-section-heading > span { display: grid; width: 1.8rem; height: 1.8rem; place-items: center; border-radius: 999px; background: var(--primary); color: var(--primary-foreground); font-size: 0.82rem; font-weight: 750; }
   .mou-form-section h2 { font-size: 1rem; font-weight: 750; }
   .mou-form-section p { margin-top: 0.2rem; color: var(--muted-foreground); font-size: 0.88rem; }
+  .form-helper-link { display: inline-flex; width: fit-content; margin-top: 0.45rem; color: var(--primary); font-size: 0.82rem; font-weight: 650; text-decoration: underline; text-underline-offset: 3px; }
   .mou-form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
   .mou-field { display: grid; gap: 0.45rem; color: var(--foreground); font-size: 0.88rem; font-weight: 650; }
   .mou-field-wide { grid-column: span 2; }

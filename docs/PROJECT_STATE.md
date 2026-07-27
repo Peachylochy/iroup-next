@@ -34,15 +34,21 @@ iROUP Next เป็นระบบใหม่ที่พัฒนาด้ว
 - เพิ่ม MOU write workflow: ร่าง → รอตรวจสอบ → มีผลบังคับใช้/เผยแพร่
 - เพิ่มหน้า `/mou/new` และ `/mou/[id]/edit` เชื่อมกับ Supabase RPC โดยตรง
 - ปิด direct write จาก browser สำหรับ MOU และบังคับผ่าน workflow RPC
+- เพิ่มคลังองค์กรคู่ความร่วมมือที่ `/mou/organizations` พร้อมสร้าง/แก้ไขข้อมูล
+  องค์กรจากหนังสือขอลงนาม และสถานะ ยืนยันแล้ว/รอตรวจสอบ/ข้อมูลไม่ครบ
+- เชื่อมฟอร์ม MOU กับทางลัด “ไม่พบองค์กร? เพิ่มจากหนังสือฉบับนี้”
 
 ## สถานะฐานข้อมูลและความปลอดภัย
 
 - Supabase production migrations ใช้งานถึง:
   - `20260727034322_mou_write_workflow`
+  - `20260727045323_partner_organization_workflow`
 - ทดสอบสิทธิ์ MOU บน remote database ด้วย transaction rollback ผ่าน: direct write
   ถูกปิด, Editor สร้าง/ส่งตรวจได้แต่เผยแพร่ไม่ได้, Publisher เผยแพร่ได้ และ Viewer ถูกปฏิเสธ
 - เพิ่มและรัน pgTAP test ที่ `supabase/tests/mou_write_workflow_test.sql` บน local
   Supabase หลัง reset จาก migrations จริง: ผ่าน 9/9 tests
+- เพิ่มและรัน pgTAP test ที่ `supabase/tests/partner_organization_workflow_test.sql`:
+  ผ่าน 5/5 tests
 - Supabase database lint ไม่พบ schema error
 - Security Advisor แจ้ง Security Definer สำหรับ MOU RPC 4 ตัวตามคาด เพราะ RPC
   ต้องทำงานแบบ atomic; ทุกตัวตรวจสิทธิ์ผู้เรียกภายในก่อนทำงาน
@@ -55,6 +61,7 @@ iROUP Next เป็นระบบใหม่ที่พัฒนาด้ว
 - User management: `http://localhost:3000/settings/users`
 - MOU list: `http://localhost:3000/mou`
 - MOU create: `http://localhost:3000/mou/new`
+- Partner organizations: `http://localhost:3000/mou/organizations`
 - ESLint ผ่าน
 - TypeScript ผ่าน
 - Next.js production build ผ่าน
@@ -73,8 +80,8 @@ iROUP Next เป็นระบบใหม่ที่พัฒนาด้ว
 ## จุดเริ่มงานครั้งถัดไป
 
 1. ตรวจและ Merge PR ของ App Shell/MOU workflow เข้า `main`
-2. ทำหน้าองค์กรคู่ความร่วมมือและเชื่อมเข้าฟอร์ม MOU ให้จัดการตัวเลือกได้
-3. เพิ่ม return-to-draft, document attachments และหน้า detail ของ MOU
+2. เพิ่ม return-to-draft, document attachments และหน้า detail ของ MOU
+3. เพิ่ม workflow รวม/ตรวจชื่อซ้ำขององค์กร และนำเข้าข้อมูลองค์กรเดิมจากไฟล์
 4. ต่อหน้าผู้ติดต่อองค์กรต่างประเทศกับฐานข้อมูล private ที่เตรียมไว้
 
 ## ข้อควรจำ

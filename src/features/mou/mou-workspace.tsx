@@ -13,7 +13,7 @@ import {
 
 import { WorkspaceChrome } from "@/components/app-shell/workspace-chrome";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import type { CurrentUserAccess } from "@/lib/auth/access";
 import { cn } from "@/lib/utils";
@@ -108,10 +108,10 @@ export function MouWorkspace({ access, agreements, viewer }: Props) {
             </p>
           </div>
           {canCreate ? (
-            <Button nativeButton={false} size="lg" render={<Link href="/mou/new" />}>
+            <Link className={cn(buttonVariants({ size: "lg" }))} href="/mou/new">
               <Plus data-icon="inline-start" />
               เพิ่ม MOU
-            </Button>
+            </Link>
           ) : null}
         </div>
 
@@ -192,14 +192,7 @@ export function MouWorkspace({ access, agreements, viewer }: Props) {
                     {statusLabels[agreement.status]}
                   </Badge>
                   {canUpdate ? (
-                    <Button
-                      nativeButton={false}
-                      variant="outline"
-                      size="sm"
-                      render={<Link href={`/mou/${agreement.id}/edit`} />}
-                    >
-                      แก้ไข
-                    </Button>
+                    <Link className={cn(buttonVariants({ variant: "outline", size: "sm" }))} href={`/mou/${agreement.id}/edit`}>แก้ไข</Link>
                   ) : null}
                 </article>
               ))}

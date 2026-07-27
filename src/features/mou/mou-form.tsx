@@ -16,6 +16,7 @@ type Props = {
   access: CurrentUserAccess;
   agreement: MouFormAgreement | null;
   options: MouFormOptions;
+  preselectedPartnerId?: string;
 };
 
 const initialState: MouFormState = {};
@@ -27,11 +28,11 @@ function formStatus(agreement: MouFormAgreement | null) {
   return "ฉบับร่าง";
 }
 
-export function MouForm({ access, agreement, options }: Props) {
+export function MouForm({ access, agreement, options, preselectedPartnerId }: Props) {
   const router = useRouter();
   const [state, formAction, isPending] = useActionState(submitMouForm, initialState);
   const isLocked = agreement?.workflow_status === "under_review" || agreement?.workflow_status === "active";
-  const selectedPartner = agreement?.agreement_partners.find((item) => item.is_lead)?.partner_organization_id;
+  const selectedPartner = agreement?.agreement_partners.find((item) => item.is_lead)?.partner_organization_id ?? preselectedPartnerId;
   const selectedUnit = agreement?.agreement_units.find((item) => item.is_owner)?.organization_unit_id;
 
   useEffect(() => {
@@ -87,6 +88,7 @@ export function MouForm({ access, agreement, options }: Props) {
                 <option value="">เลือกองค์กรคู่ความร่วมมือ</option>
                 {options.partners.map((partner) => <option key={partner.id} value={partner.id}>{partner.name_th || partner.name_en}</option>)}
               </select>
+              {!isLocked ? <Link className="form-helper-link" href={`/mou/organizations/new?returnTo=${encodeURIComponent(agreement ? `/mou/${agreement.id}/edit` : "/mou/new")}`}>ไม่พบองค์กร? เพิ่มจากหนังสือฉบับนี้</Link> : null}
             </label>
             <label className="mou-field mou-field-wide">หน่วยงานเจ้าของ
               <select name="owner_unit_id" defaultValue={selectedUnit ?? ""} disabled={isLocked}>
