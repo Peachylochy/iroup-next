@@ -20,10 +20,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { signOutAction } from "@/features/auth/actions";
-import {
-  type DashboardViewer,
-  SidebarContent,
-} from "@/features/dashboard/dashboard-workspace";
+import type { DashboardViewer } from "@/features/dashboard/dashboard-workspace";
+import { SidebarContent } from "@/components/app-shell/workspace-sidebar";
 import type {
   CurrentUserAccess,
   ModuleKey,

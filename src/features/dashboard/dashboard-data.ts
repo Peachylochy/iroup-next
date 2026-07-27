@@ -24,13 +24,13 @@ export const navigationGroups = [
   },
   {
     label: "ความร่วมมือและ MOU",
-    href: "#module-overview",
+    href: "/mou",
     icon: Handshake,
     module: "mou",
     children: [
       {
         label: "องค์กรคู่ความร่วมมือ",
-        href: "#module-overview",
+        href: "/mou/organizations",
         icon: UsersRound,
         module: "mou",
       },

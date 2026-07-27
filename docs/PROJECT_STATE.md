@@ -1,7 +1,7 @@
 # iROUP Next: Project State
 
 อัปเดตล่าสุด: 27 กรกฎาคม 2569  
-สถานะ: ระบบพื้นฐานและโมดูลจัดการผู้ใช้พร้อมใช้งานบน Local
+สถานะ: ระบบพื้นฐาน, App Shell และหน้า MOU รายการแรกพร้อมใช้งานบน Local
 
 ## ภาพรวมปัจจุบัน
 
@@ -28,6 +28,9 @@ iROUP Next เป็นระบบใหม่ที่พัฒนาด้ว
 - ย้ายฟังก์ชันที่ยกระดับสิทธิ์ไปยัง private schema และเปิด public RPC
   ผ่าน Security Invoker wrapper
 - ตรวจ Responsive layout สำหรับ Desktop และ Mobile
+- Merge PR #1 เข้า `main` สำเร็จด้วย merge commit `1dcfb4a`
+- เพิ่ม shared App Shell components สำหรับ Sidebar และ Workspace Chrome
+- เพิ่มหน้า `/mou` สำหรับรายการ MOU พร้อมค้นหา กรองสถานะ และ empty state
 
 ## สถานะฐานข้อมูลและความปลอดภัย
 
@@ -44,6 +47,7 @@ iROUP Next เป็นระบบใหม่ที่พัฒนาด้ว
 
 - Local URL: `http://localhost:3000`
 - User management: `http://localhost:3000/settings/users`
+- MOU list: `http://localhost:3000/mou`
 - ESLint ผ่าน
 - TypeScript ผ่าน
 - Next.js production build ผ่าน
@@ -55,18 +59,16 @@ iROUP Next เป็นระบบใหม่ที่พัฒนาด้ว
 ## GitHub
 
 - Repository: `Peachylochy/iroup-next`
-- Working branch: `agent/user-permissions`
-- Feature commit: `46da11d Add secure user permission management`
-- Draft PR: `#1 Add secure user permission management`
-- PR status: Mergeable และรอ Merge เข้า `main`
+- Main includes PR #1 merge commit: `1dcfb4a Add secure user permission management`
+- Current feature branch: `agent/mou-app-shell`
+- Current work: shared App Shell และ MOU list screen
 
 ## จุดเริ่มงานครั้งถัดไป
 
-1. ตรวจหน้า User Management รอบสุดท้ายและ Merge PR #1 เข้า `main`
-2. สร้าง App Shell และรูปแบบหน้ารายการ/เพิ่ม/แก้ไขให้เป็น component กลาง
-3. เริ่มโมดูล MOU ด้วยหน้าองค์กรคู่ความร่วมมือและรายการ MOU
-4. ต่อหน้าผู้ติดต่อองค์กรต่างประเทศกับฐานข้อมูล private ที่เตรียมไว้
-5. วาง Import workflow สำหรับข้อมูล Excel/CSV หลังหน้ารายการมาตรฐานพร้อม
+1. ตรวจและ Merge PR ของ App Shell/MOU เข้า `main`
+2. ทำหน้าสร้าง/แก้ไข MOU และหน้าองค์กรคู่ความร่วมมือ
+3. ต่อหน้าผู้ติดต่อองค์กรต่างประเทศกับฐานข้อมูล private ที่เตรียมไว้
+4. วาง Import workflow สำหรับข้อมูล Excel/CSV หลังหน้ารายการมาตรฐานพร้อม
 
 ## ข้อควรจำ
 
@@ -74,5 +76,5 @@ iROUP Next เป็นระบบใหม่ที่พัฒนาด้ว
 - การอนุญาตสิทธิ์ต้องบังคับใช้ที่ PostgreSQL/RLS ไม่พึ่งการซ่อนปุ่มใน React
 - ข้อมูลผู้ติดต่อองค์กรต่างประเทศเป็นข้อมูลภายในและห้ามเปิด public
 - ก่อนเริ่มงานครั้งถัดไปให้ตรวจ `git status`, Supabase migration list
-  และสถานะ PR #1 ก่อนเสมอ
+  และสถานะ PR ล่าสุดก่อนเสมอ
 
