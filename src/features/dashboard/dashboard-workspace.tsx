@@ -1,13 +1,11 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import Link from "next/link";
 import {
   ArrowRight,
   Bell,
   CalendarDays,
   ChevronDown,
-  ChevronLeft,
   LockKeyhole,
   LogOut,
   Menu,
@@ -22,12 +20,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { signOutAction } from "@/features/auth/actions";
-import type { CurrentUserAccess, ModuleKey } from "@/lib/auth/access";
+import { SidebarContent } from "@/components/app-shell/workspace-sidebar";
+import type { CurrentUserAccess } from "@/lib/auth/access";
 import { cn } from "@/lib/utils";
 
 import {
   moduleSummaries,
-  navigationGroups,
   priorityItems,
   quickCreateItems,
   recentActivities,
@@ -55,21 +53,6 @@ const toneClass: Record<Tone, string> = {
   attention: "status-attention",
 };
 
-export function Brand() {
-  return (
-    <Link className="brand-lockup" href="/" aria-label="iROUP Portal">
-      <span className="brand-mark" aria-hidden="true">
-        iR
-      </span>
-      <span>
-        <strong>iROUP Portal</strong>
-        <small>กองบริการการศึกษา</small>
-        <small>มหาวิทยาลัยพะเยา</small>
-      </span>
-    </Link>
-  );
-}
-
 function InternalBadge({ compact = false }: { compact?: boolean }) {
   return (
     <Badge
@@ -79,88 +62,6 @@ function InternalBadge({ compact = false }: { compact?: boolean }) {
       <LockKeyhole data-icon="inline-start" />
       {compact ? "ภายใน" : "ภายในเท่านั้น"}
     </Badge>
-  );
-}
-
-export function SidebarContent({
-  access,
-  onNavigate,
-  activePath = "/",
-}: {
-  access?: CurrentUserAccess;
-  onNavigate?: () => void;
-  activePath?: string;
-}) {
-  const canView = (module: ModuleKey) =>
-    !access || Boolean(access.modules[module]?.view);
-  const resolveHref = (href: string) =>
-    activePath !== "/" && href.startsWith("#") ? `/${href}` : href;
-
-  return (
-    <div className="sidebar-content">
-      <Brand />
-      <nav className="sidebar-nav" aria-label="เมนูหลัก">
-        {navigationGroups.map((item) => {
-          const visibleChildren =
-            "children" in item
-              ? item.children.filter((child) => canView(child.module))
-              : [];
-          const itemVisible =
-            !("module" in item) ||
-            canView(item.module) ||
-            visibleChildren.length > 0;
-          if (!itemVisible) return null;
-
-          const Icon = item.icon;
-          return (
-            <div className="nav-group" key={item.label}>
-              <a
-                className={cn(
-                  "nav-item",
-                  item.href === activePath && "nav-item-active",
-                )}
-                href={resolveHref(item.href)}
-                onClick={onNavigate}
-              >
-                <Icon aria-hidden="true" />
-                <span>{item.label}</span>
-                {"children" in item ? (
-                  <ChevronDown className="nav-chevron" aria-hidden="true" />
-                ) : null}
-              </a>
-              {"children" in item ? (
-                <div className="nav-children">
-                  {visibleChildren.map((child) => {
-                    const ChildIcon = child.icon;
-                    return (
-                      <a
-                        className="nav-child"
-                        href={resolveHref(child.href)}
-                        key={child.label}
-                        onClick={onNavigate}
-                      >
-                        <ChildIcon aria-hidden="true" />
-                        <span>{child.label}</span>
-                        {"internal" in child && child.internal ? (
-                          <LockKeyhole
-                            className="nav-lock"
-                            aria-label="ข้อมูลภายใน"
-                          />
-                        ) : null}
-                      </a>
-                    );
-                  })}
-                </div>
-              ) : null}
-            </div>
-          );
-        })}
-      </nav>
-      <div className="sidebar-footer">
-        <ChevronLeft aria-hidden="true" />
-        <span>ย่อเมนู</span>
-      </div>
-    </div>
   );
 }
 
