@@ -18,7 +18,7 @@ import {
 export const navigationGroups = [
   {
     label: "ภาพรวม",
-    href: "#main",
+    href: "/",
     icon: LayoutDashboard,
     active: true,
   },
@@ -99,7 +99,12 @@ export const navigationGroups = [
     icon: MapPinned,
     module: "reports",
   },
-  { label: "ตั้งค่าระบบ", href: "#main", icon: Settings, module: "settings" },
+  {
+    label: "ตั้งค่าระบบ",
+    href: "/settings/users",
+    icon: Settings,
+    module: "settings",
+  },
 ] as const;
 
 export const priorityItems = [

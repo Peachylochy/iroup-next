@@ -1439,3 +1439,656 @@
     padding: 32px 20px;
   }
 }
+
+@layer components {
+  .settings-main {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    gap: 28px;
+    padding: 32px 36px 48px;
+  }
+
+  .settings-heading {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px;
+  }
+
+  .settings-eyebrow {
+    color: var(--primary);
+    font-size: 11px;
+    font-weight: 700;
+  }
+
+  .settings-heading h1 {
+    margin-top: 5px;
+    font-size: 30px;
+    font-weight: 700;
+    letter-spacing: -0.025em;
+  }
+
+  .settings-heading > div:first-child > p:last-child {
+    margin-top: 5px;
+    color: var(--muted-foreground);
+    font-size: 13px;
+  }
+
+  .settings-summary {
+    display: flex;
+    min-width: 174px;
+    align-items: center;
+    gap: 12px;
+    border: 1px solid var(--border);
+    background: var(--background);
+    padding: 13px 16px;
+  }
+
+  .settings-summary-icon {
+    display: inline-flex;
+    width: 38px;
+    height: 38px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: var(--secondary);
+    color: var(--primary);
+  }
+
+  .settings-summary-icon svg {
+    width: 19px;
+  }
+
+  .settings-summary > span:last-child {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .settings-summary strong {
+    color: var(--primary);
+    font-size: 22px;
+    line-height: 1;
+  }
+
+  .settings-summary small {
+    margin-top: 4px;
+    color: var(--muted-foreground);
+    font-size: 10px;
+  }
+
+  .user-directory {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    border: 1px solid var(--border);
+    background: var(--background);
+  }
+
+  .directory-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    border-bottom: 1px solid var(--border);
+    padding: 18px 20px;
+  }
+
+  .directory-toolbar h2 {
+    font-size: 17px;
+    font-weight: 700;
+  }
+
+  .directory-toolbar p {
+    margin-top: 2px;
+    color: var(--muted-foreground);
+    font-size: 10px;
+  }
+
+  .directory-search {
+    position: relative;
+    display: flex;
+    width: min(360px, 100%);
+    align-items: center;
+  }
+
+  .directory-search > svg {
+    position: absolute;
+    left: 12px;
+    z-index: 1;
+    width: 16px;
+    color: var(--muted-foreground);
+  }
+
+  .directory-search input {
+    height: 40px;
+    padding-left: 38px;
+    font-size: 11px;
+  }
+
+  .user-table-wrap {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+  }
+
+  .user-table {
+    width: 100%;
+    min-width: 800px;
+    border-collapse: collapse;
+    text-align: left;
+  }
+
+  .user-table th,
+  .user-table td {
+    border-bottom: 1px solid var(--border);
+    padding: 13px 16px;
+  }
+
+  .user-table thead th {
+    background: color-mix(in oklch, var(--muted), transparent 45%);
+    color: var(--muted-foreground);
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+
+  .user-table tbody tr {
+    transition: background 160ms ease;
+  }
+
+  .user-table tbody tr:hover {
+    background: color-mix(in oklch, var(--secondary), transparent 68%);
+  }
+
+  .user-table tbody tr:last-child td {
+    border-bottom: 0;
+  }
+
+  .user-table td {
+    color: var(--muted-foreground);
+    font-size: 10px;
+  }
+
+  .user-table td:last-child {
+    text-align: right;
+  }
+
+  .user-identity {
+    display: flex;
+    min-width: 220px;
+    align-items: center;
+    gap: 11px;
+  }
+
+  .user-identity [data-slot="avatar"] {
+    color: var(--primary);
+  }
+
+  .user-identity > span {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+  }
+
+  .user-identity strong {
+    overflow: hidden;
+    color: var(--foreground);
+    font-size: 11px;
+    font-weight: 650;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .user-identity small {
+    overflow: hidden;
+    margin-top: 2px;
+    color: var(--muted-foreground);
+    font-size: 9px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .account-status,
+  .role-chip {
+    display: inline-flex;
+    align-items: center;
+    border-radius: 999px;
+    padding: 4px 8px;
+    font-size: 9px;
+    font-weight: 650;
+    white-space: nowrap;
+  }
+
+  .account-status::before {
+    width: 6px;
+    height: 6px;
+    margin-right: 5px;
+    border-radius: 50%;
+    background: currentColor;
+    content: "";
+  }
+
+  .account-status.is-active {
+    background: color-mix(in oklch, var(--status-positive), transparent 90%);
+    color: var(--status-positive);
+  }
+
+  .account-status.is-disabled {
+    background: var(--muted);
+    color: var(--muted-foreground);
+  }
+
+  .role-chip {
+    background: var(--secondary);
+    color: var(--primary);
+  }
+
+  .role-none {
+    background: var(--muted);
+    color: var(--muted-foreground);
+  }
+
+  .module-count {
+    color: var(--foreground);
+    font-size: 11px;
+  }
+
+  .directory-empty {
+    display: flex;
+    min-height: 260px;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    color: var(--muted-foreground);
+    text-align: center;
+  }
+
+  .directory-empty svg {
+    width: 32px;
+    margin-bottom: 12px;
+    color: var(--primary);
+  }
+
+  .directory-empty strong {
+    color: var(--foreground);
+    font-size: 13px;
+  }
+
+  .directory-empty span {
+    margin-top: 4px;
+    font-size: 10px;
+  }
+
+  .permission-layer {
+    position: fixed;
+    inset: 0;
+    z-index: 70;
+  }
+
+  .permission-backdrop {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    background: oklch(0.18 0.03 290 / 44%);
+    backdrop-filter: blur(2px);
+  }
+
+  .permission-panel {
+    position: absolute;
+    inset: 0 0 0 auto;
+    display: flex;
+    width: min(680px, 92vw);
+    flex-direction: column;
+    overflow: hidden;
+    background: var(--background);
+    box-shadow: -24px 0 70px oklch(0.18 0.04 290 / 20%);
+  }
+
+  .permission-panel-header {
+    display: flex;
+    min-height: 96px;
+    align-items: flex-start;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+    padding: 22px 24px 18px;
+  }
+
+  .permission-panel-header p {
+    color: var(--primary);
+    font-size: 9px;
+    font-weight: 700;
+  }
+
+  .permission-panel-header h2 {
+    margin-top: 3px;
+    font-size: 20px;
+    font-weight: 700;
+  }
+
+  .permission-panel-header span {
+    display: block;
+    margin-top: 2px;
+    color: var(--muted-foreground);
+    font-size: 10px;
+  }
+
+  .permission-form {
+    display: flex;
+    min-height: 0;
+    flex: 1;
+    flex-direction: column;
+    overflow-y: auto;
+  }
+
+  .permission-section {
+    border-bottom: 1px solid var(--border);
+    padding: 20px 24px;
+  }
+
+  .permission-section-title h3 {
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  .permission-section-title p,
+  .role-description {
+    margin-top: 3px;
+    color: var(--muted-foreground);
+    font-size: 9px;
+    line-height: 1.55;
+  }
+
+  .role-select {
+    position: relative;
+    display: flex;
+    align-items: center;
+    margin-top: 14px;
+  }
+
+  .role-select select {
+    width: 100%;
+    height: 42px;
+    appearance: none;
+    border: 1px solid var(--input);
+    border-radius: var(--radius-md);
+    background: var(--background);
+    padding: 0 40px 0 12px;
+    color: var(--foreground);
+    font-family: inherit;
+    font-size: 11px;
+  }
+
+  .role-select select:focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+
+  .role-select select:disabled {
+    background: var(--muted);
+    color: var(--muted-foreground);
+  }
+
+  .role-select svg {
+    position: absolute;
+    right: 12px;
+    width: 15px;
+    pointer-events: none;
+  }
+
+  .self-protection-note {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+    border-left: 3px solid var(--primary);
+    background: var(--secondary);
+    padding: 9px 10px;
+    color: var(--primary);
+    font-size: 9px;
+    line-height: 1.55;
+  }
+
+  .self-protection-note svg {
+    width: 15px;
+    flex: none;
+  }
+
+  .module-permission-section {
+    padding-inline: 0;
+  }
+
+  .module-permission-section .permission-section-title {
+    padding-inline: 24px;
+  }
+
+  .permission-matrix-wrap {
+    margin-top: 14px;
+    overflow-x: auto;
+  }
+
+  .permission-matrix {
+    width: 100%;
+    min-width: 610px;
+    border-collapse: collapse;
+  }
+
+  .permission-matrix th,
+  .permission-matrix td {
+    height: 40px;
+    border-top: 1px solid var(--border);
+    padding: 6px 7px;
+    text-align: center;
+  }
+
+  .permission-matrix thead th {
+    color: var(--muted-foreground);
+    font-size: 8px;
+    font-weight: 600;
+  }
+
+  .permission-matrix thead th:first-child,
+  .permission-matrix tbody th {
+    padding-left: 24px;
+    text-align: left;
+  }
+
+  .permission-matrix tbody th {
+    color: var(--foreground);
+    font-size: 9px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  .permission-check {
+    display: inline-flex;
+    cursor: pointer;
+  }
+
+  .permission-check input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+  }
+
+  .permission-check span {
+    display: inline-flex;
+    width: 20px;
+    height: 20px;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--input);
+    border-radius: 5px;
+    color: transparent;
+  }
+
+  .permission-check input:checked + span {
+    border-color: var(--primary);
+    background: var(--primary);
+    color: var(--primary-foreground);
+  }
+
+  .permission-check input:disabled + span {
+    cursor: not-allowed;
+    opacity: 0.48;
+  }
+
+  .permission-check input:checked:disabled + span {
+    opacity: 0.62;
+  }
+
+  .permission-check svg {
+    width: 12px;
+    stroke-width: 2.4;
+  }
+
+  .account-toggle-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    border-bottom: 1px solid var(--border);
+    padding: 18px 24px;
+  }
+
+  .account-toggle-row > span:first-child {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .account-toggle-row strong {
+    font-size: 11px;
+  }
+
+  .account-toggle-row small {
+    margin-top: 2px;
+    color: var(--muted-foreground);
+    font-size: 9px;
+  }
+
+  .toggle {
+    position: relative;
+    display: inline-flex;
+    flex: none;
+  }
+
+  .toggle input {
+    position: absolute;
+    opacity: 0;
+  }
+
+  .toggle > span:first-of-type {
+    display: block;
+    width: 38px;
+    height: 22px;
+    border-radius: 999px;
+    background: var(--muted);
+    transition: background 160ms ease;
+  }
+
+  .toggle > span:first-of-type::after {
+    display: block;
+    width: 16px;
+    height: 16px;
+    margin: 3px;
+    border-radius: 50%;
+    background: var(--background);
+    box-shadow: 0 1px 4px oklch(0.2 0.03 290 / 24%);
+    content: "";
+    transition: transform 160ms ease;
+  }
+
+  .toggle input:checked + span {
+    background: var(--status-positive);
+  }
+
+  .toggle input:checked + span::after {
+    transform: translateX(16px);
+  }
+
+  .toggle input:disabled + span {
+    cursor: not-allowed;
+    opacity: 0.55;
+  }
+
+  .permission-message {
+    margin: 14px 24px 0;
+    border-left: 3px solid var(--destructive);
+    background: color-mix(in oklch, var(--destructive), transparent 93%);
+    padding: 9px 11px;
+    color: var(--destructive);
+    font-size: 9px;
+  }
+
+  .permission-message.is-success {
+    border-left-color: var(--status-positive);
+    background: color-mix(in oklch, var(--status-positive), transparent 92%);
+    color: var(--status-positive);
+  }
+
+  .permission-actions {
+    position: sticky;
+    bottom: 0;
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: auto;
+    border-top: 1px solid var(--border);
+    background: color-mix(in oklch, var(--background), transparent 4%);
+    padding: 16px 24px;
+    backdrop-filter: blur(10px);
+  }
+}
+
+@media (max-width: 700px) {
+  .settings-main {
+    gap: 20px;
+    padding: 20px 14px 32px;
+  }
+
+  .settings-heading {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .settings-heading h1 {
+    font-size: 25px;
+  }
+
+  .settings-summary {
+    width: 100%;
+  }
+
+  .directory-toolbar {
+    align-items: stretch;
+    flex-direction: column;
+    padding: 16px;
+  }
+
+  .directory-search {
+    width: 100%;
+  }
+
+  .permission-panel {
+    width: 100%;
+  }
+
+  .permission-panel-header,
+  .permission-section {
+    padding-inline: 18px;
+  }
+
+  .module-permission-section {
+    padding-inline: 0;
+  }
+
+  .module-permission-section .permission-section-title {
+    padding-inline: 18px;
+  }
+
+  .permission-matrix thead th:first-child,
+  .permission-matrix tbody th {
+    padding-left: 18px;
+  }
+}

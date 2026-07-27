@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Link from "next/link";
 import {
   ArrowRight,
   Bell,
@@ -36,7 +37,7 @@ import type { DashboardSnapshot } from "./dashboard-query";
 
 type Tone = "critical" | "warning" | "attention";
 
-type DashboardViewer = {
+export type DashboardViewer = {
   displayName: string;
   email: string;
   role: string;
@@ -54,9 +55,9 @@ const toneClass: Record<Tone, string> = {
   attention: "status-attention",
 };
 
-function Brand() {
+export function Brand() {
   return (
-    <a className="brand-lockup" href="#main" aria-label="iROUP Portal">
+    <Link className="brand-lockup" href="/" aria-label="iROUP Portal">
       <span className="brand-mark" aria-hidden="true">
         iR
       </span>
@@ -65,7 +66,7 @@ function Brand() {
         <small>กองบริการการศึกษา</small>
         <small>มหาวิทยาลัยพะเยา</small>
       </span>
-    </a>
+    </Link>
   );
 }
 
@@ -81,15 +82,19 @@ function InternalBadge({ compact = false }: { compact?: boolean }) {
   );
 }
 
-function SidebarContent({
+export function SidebarContent({
   access,
   onNavigate,
+  activePath = "/",
 }: {
   access?: CurrentUserAccess;
   onNavigate?: () => void;
+  activePath?: string;
 }) {
   const canView = (module: ModuleKey) =>
     !access || Boolean(access.modules[module]?.view);
+  const resolveHref = (href: string) =>
+    activePath !== "/" && href.startsWith("#") ? `/${href}` : href;
 
   return (
     <div className="sidebar-content">
@@ -112,9 +117,9 @@ function SidebarContent({
               <a
                 className={cn(
                   "nav-item",
-                  "active" in item && item.active && "nav-item-active",
+                  item.href === activePath && "nav-item-active",
                 )}
-                href={item.href}
+                href={resolveHref(item.href)}
                 onClick={onNavigate}
               >
                 <Icon aria-hidden="true" />
@@ -130,7 +135,7 @@ function SidebarContent({
                     return (
                       <a
                         className="nav-child"
-                        href={child.href}
+                        href={resolveHref(child.href)}
                         key={child.label}
                         onClick={onNavigate}
                       >
