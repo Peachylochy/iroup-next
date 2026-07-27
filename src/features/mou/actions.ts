@@ -32,9 +32,35 @@ function textValue(formData: FormData, name: string) {
   return typeof value === "string" ? value.trim() : "";
 }
 
+type RelationItem = { id: string; isLead?: boolean; isOwner?: boolean };
+
+function relationItems(formData: FormData, name: string): RelationItem[] {
+  const raw = textValue(formData, name);
+  if (!raw) return [];
+
+  try {
+    const parsed: unknown = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return [];
+    const seen = new Set<string>();
+    return parsed.flatMap((item) => {
+      if (!item || typeof item !== "object" || !("id" in item) || typeof item.id !== "string" || !item.id || seen.has(item.id)) {
+        return [];
+      }
+      seen.add(item.id);
+      return [{
+        id: item.id,
+        isLead: "isLead" in item && item.isLead === true,
+        isOwner: "isOwner" in item && item.isOwner === true,
+      }];
+    });
+  } catch {
+    return [];
+  }
+}
+
 function payloadFromForm(formData: FormData) {
-  const partnerId = textValue(formData, "partner_id");
-  const ownerUnitId = textValue(formData, "owner_unit_id");
+  const partners = relationItems(formData, "partners_json");
+  const units = relationItems(formData, "units_json");
 
   return {
     title_th: textValue(formData, "title_th"),
@@ -46,8 +72,8 @@ function payloadFromForm(formData: FormData) {
     end_date: textValue(formData, "end_date"),
     fiscal_year: textValue(formData, "fiscal_year"),
     internal_note: textValue(formData, "internal_note"),
-    partners: partnerId ? [{ id: partnerId, is_lead: true }] : [],
-    units: ownerUnitId ? [{ id: ownerUnitId, is_owner: true }] : [],
+    partners: partners.map(({ id, isLead }) => ({ id, is_lead: isLead })),
+    units: units.map(({ id, isOwner }) => ({ id, is_owner: isOwner })),
   };
 }
 

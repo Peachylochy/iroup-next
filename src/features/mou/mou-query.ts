@@ -49,7 +49,12 @@ export async function getMouAgreements() {
 }
 
 export type MouFormOptions = {
-  partners: Array<{ id: string; name_th: string | null; name_en: string }>;
+  partners: Array<{
+    id: string;
+    name_th: string | null;
+    name_en: string | null;
+    countries: { name_th: string; name_en: string } | null;
+  }>;
   units: Array<{ id: string; name_th: string; name_en: string | null }>;
 };
 
@@ -69,7 +74,7 @@ export async function getMouFormOptions(): Promise<MouFormOptions> {
   const [partnersResult, unitsResult] = await Promise.all([
     supabase
       .from("partner_organizations")
-      .select("id, name_th, name_en")
+      .select("id, name_th, name_en, countries(name_th, name_en)")
       .eq("active", true)
       .order("name_en"),
     supabase
@@ -85,7 +90,20 @@ export async function getMouFormOptions(): Promise<MouFormOptions> {
     );
   }
 
-  return { partners: partnersResult.data, units: unitsResult.data };
+  const partners = partnersResult.data.map((partner) => {
+    const country = Array.isArray(partner.countries)
+      ? partner.countries[0] ?? null
+      : partner.countries;
+
+    return {
+      id: partner.id,
+      name_th: partner.name_th,
+      name_en: partner.name_en,
+      countries: country ? { name_th: country.name_th, name_en: country.name_en } : null,
+    };
+  }) as MouFormOptions["partners"];
+
+  return { partners, units: unitsResult.data };
 }
 
 export async function getMouAgreementForForm(id: string): Promise<MouFormAgreement | null> {

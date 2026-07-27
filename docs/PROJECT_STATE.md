@@ -83,9 +83,9 @@ iROUP Next เป็นระบบใหม่ที่พัฒนาด้ว
 ## จุดเริ่มงานครั้งถัดไป
 
 1. ตรวจและ Merge PR ของ App Shell/MOU workflow เข้า `main`
-2. Review `docs/MOU_PRESERVE_IMPROVE_RETIRE_MATRIX.md` และยืนยัน 7 จุดตัดสินใจก่อนแก้ schema/form MOU ต่อ
-3. เพิ่ม return-to-draft, document attachments และหน้า detail ของ MOU ตาม matrix ที่อนุมัติ
-4. ทำ matrix ของ Mobility ก่อนเริ่มพัฒนา Mobility module
+2. ดำเนิน MOU foundation ตาม `docs/MOU_PRESERVE_IMPROVE_RETIRE_MATRIX.md`: snapshot, multi-partner/unit, fiscal year และ soft delete/restore
+3. เพิ่ม attachment worker (purge ไฟล์หลัง soft delete 30 วัน), document attachments และหน้า detail ของ MOU
+4. ทำ list/filter/export ให้ครบก่อน map/analytics และทำ matrix ของ Mobility ก่อนเริ่มพัฒนา Mobility module
 
 ## ข้อควรจำ
 

@@ -91,8 +91,8 @@ values ('b2000000-0000-0000-0000-000000000001', 'KR', 'KOR', 'เกาหลี
 insert into public.organization_units (id, code, name_th, name_en)
 values ('b3000000-0000-0000-0000-000000000001', 'MOU-RLS', 'หน่วยงานทดสอบ MOU', 'MOU Test Unit');
 
-insert into public.partner_organizations (id, name_en, country_id)
-values ('b4000000-0000-0000-0000-000000000001', 'MOU RLS Partner', 'b2000000-0000-0000-0000-000000000001');
+insert into public.partner_organizations (id, name_en, country_id, verification_status)
+values ('b4000000-0000-0000-0000-000000000001', 'MOU RLS Partner', 'b2000000-0000-0000-0000-000000000001', 'verified');
 
 set local role authenticated;
 set local "request.jwt.claims" =

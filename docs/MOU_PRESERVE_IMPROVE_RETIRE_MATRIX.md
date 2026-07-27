@@ -23,8 +23,11 @@ Baseline: `docs/LEGACY_FUNCTION_INVENTORY.md`, legacy `Team IROUP/mou.html`, V2 
 |---|---|
 | วันสิ้นสุด | ไม่บังคับ เพราะ MOU บางฉบับไม่มีวันหมดอายุ; ถ้ากรอกต้องไม่น้อยกว่าวันเริ่ม |
 | คู่สัญญา | รองรับหลายองค์กร และต้องกำหนดองค์กรหลัก (`lead`) เพียงหนึ่งองค์กร |
+| หน่วยงาน ม.พะเยา | มีหน่วยงานเจ้าของ (`owner`) หนึ่งหน่วยงาน และเพิ่มหน่วยงานเกี่ยวข้องได้หลายหน่วยงาน |
 | ประเทศของ MOU | ดึงจากองค์กร master โดยอัตโนมัติ และเก็บ country snapshot/override พร้อมเหตุผลเพื่อรักษาประวัติย้อนหลัง |
 | ไฟล์ MOU | เก็บเป็นข้อมูลภายในเท่านั้น; ไม่มีการเผยแพร่ไฟล์ MOU ใน public portal |
+| การลบ | Soft delete ก่อน; System Admin restore ได้ และไฟล์ที่ผูกกับ MOU จะถูก scheduled worker ลบผ่าน Storage API เมื่อครบ 30 วัน |
+| Map/กราฟหน่วยงาน | ทำใน phase analytics หลัง form, detail, attachments, list/filter และ export เสร็จ |
 
 ## Matrix ความสามารถ
 
@@ -50,7 +53,7 @@ Baseline: `docs/LEGACY_FUNCTION_INVENTORY.md`, legacy `Team IROUP/mou.html`, V2 
 | 18 | แนบไฟล์, ดูชื่อ, เปิดไฟล์, ล้าง pending file | คงไว้ | Attachment area มี upload queue, role, size/type validation, preview metadata, remove pending และ audit |
 | 19 | เปิดไฟล์ public แต่ปิด download | เลิกใช้ในความหมายเดิม | Browser ป้องกันการดาวน์โหลดไฟล์ที่แสดงได้จริงไม่ได้; ถ้าห้ามดาวน์โหลด ต้องไม่เผยไฟล์ต้นฉบับ และเผยแพร่เฉพาะ metadata/preview ที่อนุมัติ |
 | 20 | เปิดรายละเอียด MOU | ปรับปรุง | Detail เป็นศูนย์กลาง: ข้อมูลสัญญา, partners/units, files, public state, lifecycle และ timeline |
-| 21 | ลบแบบยืนยัน | ปรับปรุง | Soft delete พร้อมเหตุผล; System Admin restore ได้ตาม retention policy และ public จะหายทันที |
+| 21 | ลบแบบยืนยัน | ปรับปรุง | Soft delete พร้อมเหตุผล; System Admin restore ได้ และ scheduled worker ลบไฟล์จริงผ่าน Storage API เมื่อครบ 30 วัน |
 | 22 | Export CSV ของรายการที่กรอง | ปรับปรุง | CSV ต้องมีแน่นอน; XLSX เป็น export มาตรฐานเดียวกัน พร้อมบันทึกผู้ export และ filter ที่ใช้ |
 | 23 | แจ้ง MOU ใกล้หมดอายุบน dashboard | คงไว้ | Derived task/query ตาม threshold ที่กำหนด และ deep link ไป filter ที่เกี่ยวข้อง |
 | 24 | public list/map | ปรับปรุง | Public DTO แยกจาก admin data; ไม่มี internal note, pending organization, private contact หรือไฟล์ private |
@@ -99,11 +102,11 @@ Baseline: `docs/LEGACY_FUNCTION_INVENTORY.md`, legacy `Team IROUP/mou.html`, V2 
 4. **List + export** — filter ครบ, lifecycle derived status, CSV/XLSX
 5. **Analytics + public** — KPI, dashboard alert, unit chart, map และ public DTO
 
-## จุดที่ยังต้องยืนยันก่อนเริ่มแก้ form/migration
+## Implementation checklist ที่อนุมัติแล้ว
 
-1. **หน่วยงาน ม.พะเยา** — แนะนำให้มี owner เดียวและหน่วยงานเกี่ยวข้องหลายหน่วยงาน. ยืนยันหรือให้มี owner หลายหน่วยงาน?
-2. **การลบ** — แนะนำ soft delete และ restore ได้เฉพาะ System Admin. ระยะเก็บก่อนลบถาวรต้องกำหนดหรือไม่?
-3. **Map/กราฟหน่วยงาน** — แนะนำทำใน phase analytics หลังงานบันทึก/ไฟล์/list complete. ยืนยันลำดับนี้หรือเป็น requirement รอบแรก?
-
-> เมื่อทั้ง 3 ข้อได้รับคำตอบ ฉันจะเปลี่ยนเอกสารนี้เป็น implementation checklist
-> และเริ่ม migration/tests ก่อน แล้วจึงแก้ form MOU ตามที่อนุมัติเท่านั้น.
+1. เพิ่ม snapshot ประเทศ/ชื่อคู่สัญญา, multi-partner และ multi-unit contract ให้ MOU RPC
+2. คำนวณปีงบประมาณไทยจากวันเริ่ม และตรวจข้อมูลก่อนส่งตรวจ/เผยแพร่
+3. เพิ่ม soft delete/restore พร้อม audit; เตรียม retention contract 30 วันสำหรับ scheduled Storage worker
+4. รัน migration และ RLS/RPC tests ก่อนแก้ form
+5. ขยายฟอร์ม MOU ให้เลือกหลายองค์กร/หน่วยงาน, เลือก lead/owner และแสดงประเทศที่ดึงมา
+6. ทำ attachment worker, detail, list/filter/export แล้วจึงทำ map/analytics
