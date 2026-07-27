@@ -104,8 +104,8 @@ select lives_ok(
         'c4000000-0000-0000-0000-000000000001', original_updated_at, 'test retention'
       );
 
-      if (deleted_record ->> 'purge_files_after') is null then
-        raise exception 'missing purge deadline';
+      if deleted_record ? 'purge_files_after' then
+        raise exception 'unexpected purge deadline';
       end if;
 
       perform public.mou_restore('c4000000-0000-0000-0000-000000000001');
@@ -120,7 +120,7 @@ select lives_ok(
     end;
   $delete$;
   $$,
-  'System Admin can soft-delete and restore an MOU before its 30-day retention deadline'
+  'System Admin can soft-delete and restore an MOU without an automatic file-retention deadline'
 );
 
 select ok(

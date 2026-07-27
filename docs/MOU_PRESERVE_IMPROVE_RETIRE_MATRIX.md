@@ -26,7 +26,7 @@ Baseline: `docs/LEGACY_FUNCTION_INVENTORY.md`, legacy `Team IROUP/mou.html`, V2 
 | หน่วยงาน ม.พะเยา | มีหน่วยงานเจ้าของ (`owner`) หนึ่งหน่วยงาน และเพิ่มหน่วยงานเกี่ยวข้องได้หลายหน่วยงาน |
 | ประเทศของ MOU | ดึงจากองค์กร master โดยอัตโนมัติ และเก็บ country snapshot/override พร้อมเหตุผลเพื่อรักษาประวัติย้อนหลัง |
 | ไฟล์ MOU | เก็บเป็นข้อมูลภายในเท่านั้น; ไม่มีการเผยแพร่ไฟล์ MOU ใน public portal |
-| การลบ | Soft delete ก่อน; System Admin restore ได้ และไฟล์ที่ผูกกับ MOU จะถูก scheduled worker ลบผ่าน Storage API เมื่อครบ 30 วัน |
+| การลบ | Soft delete ก่อน; System Admin restore ได้เสมอ และไม่มี automatic file purge ในขอบเขตปัจจุบัน |
 | Map/กราฟหน่วยงาน | ทำใน phase analytics หลัง form, detail, attachments, list/filter และ export เสร็จ |
 
 ## Matrix ความสามารถ
@@ -53,7 +53,7 @@ Baseline: `docs/LEGACY_FUNCTION_INVENTORY.md`, legacy `Team IROUP/mou.html`, V2 
 | 18 | แนบไฟล์, ดูชื่อ, เปิดไฟล์, ล้าง pending file | คงไว้ | Attachment area มี upload queue, role, size/type validation, preview metadata, remove pending และ audit |
 | 19 | เปิดไฟล์ public แต่ปิด download | เลิกใช้ในความหมายเดิม | Browser ป้องกันการดาวน์โหลดไฟล์ที่แสดงได้จริงไม่ได้; ถ้าห้ามดาวน์โหลด ต้องไม่เผยไฟล์ต้นฉบับ และเผยแพร่เฉพาะ metadata/preview ที่อนุมัติ |
 | 20 | เปิดรายละเอียด MOU | ปรับปรุง | Detail เป็นศูนย์กลาง: ข้อมูลสัญญา, partners/units, files, public state, lifecycle และ timeline |
-| 21 | ลบแบบยืนยัน | ปรับปรุง | Soft delete พร้อมเหตุผล; System Admin restore ได้ และ scheduled worker ลบไฟล์จริงผ่าน Storage API เมื่อครบ 30 วัน |
+| 21 | ลบแบบยืนยัน | ปรับปรุง | Soft delete พร้อมเหตุผล; System Admin restore ได้ และไม่มีการลบไฟล์อัตโนมัติ |
 | 22 | Export CSV ของรายการที่กรอง | ปรับปรุง | CSV ต้องมีแน่นอน; XLSX เป็น export มาตรฐานเดียวกัน พร้อมบันทึกผู้ export และ filter ที่ใช้ |
 | 23 | แจ้ง MOU ใกล้หมดอายุบน dashboard | คงไว้ | Derived task/query ตาม threshold ที่กำหนด และ deep link ไป filter ที่เกี่ยวข้อง |
 | 24 | public list/map | ปรับปรุง | Public DTO แยกจาก admin data; ไม่มี internal note, pending organization, private contact หรือไฟล์ private |
@@ -106,7 +106,7 @@ Baseline: `docs/LEGACY_FUNCTION_INVENTORY.md`, legacy `Team IROUP/mou.html`, V2 
 
 1. เพิ่ม snapshot ประเทศ/ชื่อคู่สัญญา, multi-partner และ multi-unit contract ให้ MOU RPC
 2. คำนวณปีงบประมาณไทยจากวันเริ่ม และตรวจข้อมูลก่อนส่งตรวจ/เผยแพร่
-3. เพิ่ม soft delete/restore พร้อม audit; เตรียม retention contract 30 วันสำหรับ scheduled Storage worker
+3. เพิ่ม soft delete/restore พร้อม audit; การลบไฟล์อัตโนมัติอยู่นอกขอบเขตปัจจุบัน
 4. รัน migration และ RLS/RPC tests ก่อนแก้ form
 5. ขยายฟอร์ม MOU ให้เลือกหลายองค์กร/หน่วยงาน, เลือก lead/owner และแสดงประเทศที่ดึงมา
 6. ทำ attachment worker, detail, list/filter/export แล้วจึงทำ map/analytics

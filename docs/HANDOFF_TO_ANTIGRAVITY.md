@@ -36,7 +36,7 @@ MOU เป็นโมดูลแรกที่กำลัง build ตาม
 - MOU ไฟล์เป็น internal เท่านั้น; ห้าม expose ใน public portal
 - พันธมิตร `pending_verification` ส่งตรวจได้ แต่ทุก partner ต้อง `verified` ก่อน publish
 - ปีงบประมาณไทยคำนวณจากวันเริ่ม (ตุลาคมเริ่มปีงบประมาณใหม่)
-- Delete เป็น soft delete; System Admin restore ได้ก่อนครบ 30 วัน
+- Delete เป็น soft delete; System Admin restore ได้ และไม่มี automatic file purge
 
 ### Migration ล่าสุด
 
@@ -65,18 +65,13 @@ MOU เป็นโมดูลแรกที่กำลัง build ตาม
 1. ออกแบบ/ทำ migration สำหรับ MOU file attachment โดย reuse `assets` และ `record_assets`
 2. สร้าง private Storage bucket/policies และ upload/download ผ่าน signed URL สำหรับผู้มีสิทธิ์ MOU เท่านั้น
 3. ทำหน้า `/mou/[id]` detail: ข้อมูล MOU, partners/units snapshots, files, workflow timeline และ action ตาม role
-4. ทำ scheduled worker ลบไฟล์จริงหลัง MOU ถูก soft-deleted 30 วัน
-5. เพิ่ม RLS/RPC/Storage tests แล้วค่อยทำ UI
+4. เพิ่ม RLS/RPC/Storage tests แล้วค่อยทำ UI
 
-### ข้อสำคัญของ retention
+### ขอบเขตไฟล์ปัจจุบัน
 
-ห้ามลบไฟล์ใน `storage.objects` ด้วย SQL. การลบไฟล์จริงต้องเรียก Supabase Storage API
-จาก server-only scheduled worker/Edge Function; SQL delete จะเหลือ orphaned object.
-
-- ห้ามใส่ service role key ใน client หรือ Git
-- worker ต้อง idempotent และ log ผลลัพธ์ต่อ asset
-- restore ก่อนครบ 30 วันต้องยกเลิก/ข้าม purge ของ MOU นั้น
-- หลัง 30 วัน ให้คง MOU tombstone/audit ไว้ แต่ลบ file object และ asset metadata ที่เกี่ยวข้อง
+ไม่มี automatic file purge หรือ scheduled worker ใน scope ปัจจุบัน. ไฟล์ MOU เป็น internal
+เท่านั้นและคงอยู่หลัง soft delete จนกว่าจะมีนโยบาย records-retention ใหม่ที่ user อนุมัติ.
+ห้ามเพิ่ม service role key ใน client หรือ Git.
 
 ## Verification ที่ต้องรันก่อน handoff กลับ
 

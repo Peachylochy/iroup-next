@@ -41,8 +41,7 @@ iROUP Next เป็นระบบใหม่ที่พัฒนาด้ว
   คำนวณปีงบประมาณไทยจากวันเริ่ม
 - เก็บ partner/country snapshot ใน MOU, บังคับประเทศของ lead ก่อนส่งตรวจ
   และบังคับทุก partner เป็น `verified` ก่อน publish
-- เพิ่ม MOU soft delete/restore; System Admin restore ได้ก่อนครบ 30 วัน
-  โดย file purge worker จะเป็นงานถัดไปใน phase attachment
+- เพิ่ม MOU soft delete/restore; System Admin restore ได้ และไม่มี automatic file purge
 - ปิด direct write จาก browser สำหรับ MOU และบังคับผ่าน workflow RPC
 - เพิ่มคลังองค์กรคู่ความร่วมมือที่ `/mou/organizations` พร้อมสร้าง/แก้ไขข้อมูล
   องค์กรจากหนังสือขอลงนาม และสถานะ ยืนยันแล้ว/รอตรวจสอบ/ข้อมูลไม่ครบ
@@ -93,7 +92,7 @@ iROUP Next เป็นระบบใหม่ที่พัฒนาด้ว
 ## จุดเริ่มงานครั้งถัดไป
 
 1. ตรวจและ Merge PR ของ App Shell/MOU workflow เข้า `main`
-2. เพิ่ม MOU detail, attachment management และ scheduled Storage worker สำหรับ purge ไฟล์หลัง soft delete 30 วัน
+2. เพิ่ม MOU detail และ attachment management แบบข้อมูลภายใน
 3. ทำ list/filter/export ให้ครบก่อน map/analytics
 4. ทำ matrix ของ Mobility ก่อนเริ่มพัฒนา Mobility module
 
