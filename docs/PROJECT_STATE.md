@@ -41,8 +41,8 @@ iROUP Next เป็นระบบใหม่ที่พัฒนาด้ว
   - `20260727034322_mou_write_workflow`
 - ทดสอบสิทธิ์ MOU บน remote database ด้วย transaction rollback ผ่าน: direct write
   ถูกปิด, Editor สร้าง/ส่งตรวจได้แต่เผยแพร่ไม่ได้, Publisher เผยแพร่ได้ และ Viewer ถูกปฏิเสธ
-- เพิ่ม pgTAP test ถาวรที่ `supabase/tests/mou_write_workflow_test.sql` (รอรัน local
-  หลัง Docker Desktop Linux engine พร้อมใช้งาน)
+- เพิ่มและรัน pgTAP test ที่ `supabase/tests/mou_write_workflow_test.sql` บน local
+  Supabase หลัง reset จาก migrations จริง: ผ่าน 9/9 tests
 - Supabase database lint ไม่พบ schema error
 - Security Advisor แจ้ง Security Definer สำหรับ MOU RPC 4 ตัวตามคาด เพราะ RPC
   ต้องทำงานแบบ atomic; ทุกตัวตรวจสิทธิ์ผู้เรียกภายในก่อนทำงาน
