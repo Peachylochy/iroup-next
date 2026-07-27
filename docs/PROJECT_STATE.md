@@ -83,7 +83,7 @@ iROUP Next เป็นระบบใหม่ที่พัฒนาด้ว
 ## จุดเริ่มงานครั้งถัดไป
 
 1. ตรวจและ Merge PR ของ App Shell/MOU workflow เข้า `main`
-2. Review MOU preserve/improve/retire matrix จาก legacy inventory ก่อนแก้ฟอร์มต่อ
+2. Review `docs/MOU_PRESERVE_IMPROVE_RETIRE_MATRIX.md` และยืนยัน 7 จุดตัดสินใจก่อนแก้ schema/form MOU ต่อ
 3. เพิ่ม return-to-draft, document attachments และหน้า detail ของ MOU ตาม matrix ที่อนุมัติ
 4. ทำ matrix ของ Mobility ก่อนเริ่มพัฒนา Mobility module
 
