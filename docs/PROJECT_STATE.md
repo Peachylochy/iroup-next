@@ -3,6 +3,9 @@
 อัปเดตล่าสุด: 27 กรกฎาคม 2569  
 สถานะ: ระบบพื้นฐาน, App Shell และ MOU workflow/form พร้อมใช้งานบน Local
 
+> ก่อนสร้างโมดูลใหม่หรือขยาย MOU ให้ใช้ `docs/LEGACY_FUNCTION_INVENTORY.md`
+> เป็น baseline และทำ preserve/improve/retire matrix ของโมดูลนั้นก่อนเสมอ
+
 ## ภาพรวมปัจจุบัน
 
 iROUP Next เป็นระบบใหม่ที่พัฒนาด้วย Next.js และ Supabase เพื่อทดแทนข้อจำกัด
@@ -80,9 +83,9 @@ iROUP Next เป็นระบบใหม่ที่พัฒนาด้ว
 ## จุดเริ่มงานครั้งถัดไป
 
 1. ตรวจและ Merge PR ของ App Shell/MOU workflow เข้า `main`
-2. เพิ่ม return-to-draft, document attachments และหน้า detail ของ MOU
-3. เพิ่ม workflow รวม/ตรวจชื่อซ้ำขององค์กร และนำเข้าข้อมูลองค์กรเดิมจากไฟล์
-4. ต่อหน้าผู้ติดต่อองค์กรต่างประเทศกับฐานข้อมูล private ที่เตรียมไว้
+2. Review MOU preserve/improve/retire matrix จาก legacy inventory ก่อนแก้ฟอร์มต่อ
+3. เพิ่ม return-to-draft, document attachments และหน้า detail ของ MOU ตาม matrix ที่อนุมัติ
+4. ทำ matrix ของ Mobility ก่อนเริ่มพัฒนา Mobility module
 
 ## ข้อควรจำ
 
