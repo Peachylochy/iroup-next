@@ -1353,6 +1353,27 @@
     color: var(--muted-foreground);
   }
 
+  .back-link { display: inline-flex; align-items: center; gap: 0.4rem; margin-bottom: 0.75rem; color: var(--muted-foreground); font-size: 0.88rem; }
+  .back-link:hover { color: var(--primary); }
+  .workflow-state { display: inline-flex; align-items: center; gap: 0.45rem; border: 1px solid color-mix(in oklch, var(--primary), transparent 72%); border-radius: 999px; background: color-mix(in oklch, var(--primary), transparent 92%); color: var(--primary); padding: 0.55rem 0.85rem; font-size: 0.86rem; font-weight: 650; }
+  .workflow-state svg { width: 1rem; }
+  .mou-editor-form { display: grid; max-width: 960px; gap: 1rem; }
+  .mou-form-section { border: 1px solid var(--border); border-radius: 1rem; background: var(--card); padding: 1.25rem; }
+  .mou-form-section-heading { display: flex; align-items: flex-start; gap: 0.75rem; margin-bottom: 1.15rem; }
+  .mou-form-section-heading > span { display: grid; width: 1.8rem; height: 1.8rem; place-items: center; border-radius: 999px; background: var(--primary); color: var(--primary-foreground); font-size: 0.82rem; font-weight: 750; }
+  .mou-form-section h2 { font-size: 1rem; font-weight: 750; }
+  .mou-form-section p { margin-top: 0.2rem; color: var(--muted-foreground); font-size: 0.88rem; }
+  .mou-form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+  .mou-field { display: grid; gap: 0.45rem; color: var(--foreground); font-size: 0.88rem; font-weight: 650; }
+  .mou-field-wide { grid-column: span 2; }
+  .mou-field select, .mou-field textarea { width: 100%; border: 1px solid var(--input); border-radius: 0.55rem; background: transparent; padding: 0.55rem 0.7rem; color: var(--foreground); font: inherit; font-weight: 400; }
+  .mou-field textarea { resize: vertical; }
+  .mou-field select:focus, .mou-field textarea:focus { outline: 2px solid color-mix(in oklch, var(--ring), transparent 50%); }
+  .mou-form-actions { display: flex; justify-content: flex-end; gap: 0.7rem; }
+  .mou-form-message { display: flex; align-items: center; gap: 0.45rem; border-radius: 0.7rem; padding: 0.75rem 0.9rem; font-size: 0.9rem; }
+  .mou-form-message.is-error { background: color-mix(in oklch, var(--destructive), transparent 90%); color: var(--destructive); }
+  .mou-form-message.is-success { background: color-mix(in oklch, var(--status-positive), transparent 90%); color: var(--status-positive); }
+
   .module-empty-state {
     display: flex;
     min-height: 300px;
@@ -2405,6 +2426,11 @@
 }
 
 @media (max-width: 700px) {
+  .mou-form-grid { grid-template-columns: 1fr; }
+  .mou-field-wide { grid-column: span 1; }
+  .mou-form-actions { flex-direction: column-reverse; }
+  .mou-form-actions [data-slot="button"] { width: 100%; }
+
   .settings-main {
     gap: 20px;
     padding: 20px 14px 32px;

@@ -40,6 +40,7 @@ const statusOptions = [
 const statusLabels: Record<MouAgreement["status"], string> = {
   draft: "ร่าง",
   active: "ใช้งานอยู่",
+  expiring: "ใกล้หมดอายุ",
   expired: "หมดอายุ",
   terminated: "ยุติแล้ว",
 };
@@ -107,7 +108,7 @@ export function MouWorkspace({ access, agreements, viewer }: Props) {
             </p>
           </div>
           {canCreate ? (
-            <Button size="lg" disabled>
+            <Button size="lg" render={<Link href="/mou/new" />}>
               <Plus data-icon="inline-start" />
               เพิ่ม MOU
             </Button>
@@ -179,7 +180,7 @@ export function MouWorkspace({ access, agreements, viewer }: Props) {
                         <small>{agreement.agreement_number}</small>
                       ) : null}
                     </div>
-                    <p>{partnerName(agreement)} · {agreement.agreement_type}</p>
+                    <p>{partnerName(agreement)} · {agreement.agreement_type || "ยังไม่ระบุประเภท"}</p>
                   </div>
                   <div className="mou-row-period">
                     <small>ระยะเวลา</small>
@@ -191,7 +192,7 @@ export function MouWorkspace({ access, agreements, viewer }: Props) {
                     {statusLabels[agreement.status]}
                   </Badge>
                   {canUpdate ? (
-                    <Button variant="outline" size="sm" disabled>
+                    <Button variant="outline" size="sm" render={<Link href={`/mou/${agreement.id}/edit`} />}>
                       แก้ไข
                     </Button>
                   ) : null}

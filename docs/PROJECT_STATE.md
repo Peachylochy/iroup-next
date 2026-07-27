@@ -1,7 +1,7 @@
 # iROUP Next: Project State
 
 อัปเดตล่าสุด: 27 กรกฎาคม 2569  
-สถานะ: ระบบพื้นฐาน, App Shell และหน้า MOU รายการแรกพร้อมใช้งานบน Local
+สถานะ: ระบบพื้นฐาน, App Shell และ MOU workflow/form พร้อมใช้งานบน Local
 
 ## ภาพรวมปัจจุบัน
 
@@ -31,15 +31,21 @@ iROUP Next เป็นระบบใหม่ที่พัฒนาด้ว
 - Merge PR #1 เข้า `main` สำเร็จด้วย merge commit `1dcfb4a`
 - เพิ่ม shared App Shell components สำหรับ Sidebar และ Workspace Chrome
 - เพิ่มหน้า `/mou` สำหรับรายการ MOU พร้อมค้นหา กรองสถานะ และ empty state
+- เพิ่ม MOU write workflow: ร่าง → รอตรวจสอบ → มีผลบังคับใช้/เผยแพร่
+- เพิ่มหน้า `/mou/new` และ `/mou/[id]/edit` เชื่อมกับ Supabase RPC โดยตรง
+- ปิด direct write จาก browser สำหรับ MOU และบังคับผ่าน workflow RPC
 
 ## สถานะฐานข้อมูลและความปลอดภัย
 
 - Supabase production migrations ใช้งานถึง:
-  - `20260726185603_admin_user_management`
-  - `20260726185750_harden_admin_user_api`
-- pgTAP database tests ผ่านทั้งหมด 118 tests
+  - `20260727034322_mou_write_workflow`
+- ทดสอบสิทธิ์ MOU บน remote database ด้วย transaction rollback ผ่าน: direct write
+  ถูกปิด, Editor สร้าง/ส่งตรวจได้แต่เผยแพร่ไม่ได้, Publisher เผยแพร่ได้ และ Viewer ถูกปฏิเสธ
+- เพิ่ม pgTAP test ถาวรที่ `supabase/tests/mou_write_workflow_test.sql` (รอรัน local
+  หลัง Docker Desktop Linux engine พร้อมใช้งาน)
 - Supabase database lint ไม่พบ schema error
-- Security Advisor ไม่พบคำเตือนจาก Admin RPC ชุดใหม่
+- Security Advisor แจ้ง Security Definer สำหรับ MOU RPC 4 ตัวตามคาด เพราะ RPC
+  ต้องทำงานแบบ atomic; ทุกตัวตรวจสิทธิ์ผู้เรียกภายในก่อนทำงาน
 - ยังมีคำเตือนระดับ Project Setting เรื่อง Leaked Password Protection
   ซึ่งไม่กระทบการทำงานปัจจุบันและควรเปิดก่อน Production launch
 
@@ -48,6 +54,7 @@ iROUP Next เป็นระบบใหม่ที่พัฒนาด้ว
 - Local URL: `http://localhost:3000`
 - User management: `http://localhost:3000/settings/users`
 - MOU list: `http://localhost:3000/mou`
+- MOU create: `http://localhost:3000/mou/new`
 - ESLint ผ่าน
 - TypeScript ผ่าน
 - Next.js production build ผ่าน
@@ -65,10 +72,10 @@ iROUP Next เป็นระบบใหม่ที่พัฒนาด้ว
 
 ## จุดเริ่มงานครั้งถัดไป
 
-1. ตรวจและ Merge PR ของ App Shell/MOU เข้า `main`
-2. ทำหน้าสร้าง/แก้ไข MOU และหน้าองค์กรคู่ความร่วมมือ
-3. ต่อหน้าผู้ติดต่อองค์กรต่างประเทศกับฐานข้อมูล private ที่เตรียมไว้
-4. วาง Import workflow สำหรับข้อมูล Excel/CSV หลังหน้ารายการมาตรฐานพร้อม
+1. ตรวจและ Merge PR ของ App Shell/MOU workflow เข้า `main`
+2. ทำหน้าองค์กรคู่ความร่วมมือและเชื่อมเข้าฟอร์ม MOU ให้จัดการตัวเลือกได้
+3. เพิ่ม return-to-draft, document attachments และหน้า detail ของ MOU
+4. ต่อหน้าผู้ติดต่อองค์กรต่างประเทศกับฐานข้อมูล private ที่เตรียมไว้
 
 ## ข้อควรจำ
 
