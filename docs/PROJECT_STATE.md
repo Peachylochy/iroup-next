@@ -107,9 +107,10 @@ iROUP Next เป็นระบบใหม่ที่พัฒนาด้ว
 
 ## จุดเริ่มงานครั้งถัดไป
 
-1. Review และ merge หน้า List/Detail/Form ของ Mobility นิสิต; หน้า detail มี transition ตามสิทธิ์: ส่งกลับแก้ไข, อนุมัติ, เริ่มโครงการ และปิดโครงการ
-2. ทำ internal attachment workflow หลังยืนยัน storage integration; ยังไม่เชื่อม SharePoint อัตโนมัติจนกว่า CITCOMS อนุมัติ Graph API
-3. ทำ import preview/review สำหรับข้อมูล 407/408 แถว โดยยังไม่ commit จริง; `staff_mobility` และ `staff_official_travel` ค่อยต่อยอดตาม category contract
+1. ทดสอบและ review Import Preview ของ Mobility นิสิตจาก `IROUP_DATABASE_PRODUCTION.xlsx`: แยก 27 โครงการ/182 นิสิตออกจาก Travel และ flag โครงการ mixed ที่มีบุคลากร 2 คน; ไม่มี commit ข้อมูลจริง
+2. หลังยืนยันผล preview ให้สร้าง staging batch/review ที่เลือกเฉพาะรายการผ่านการตรวจ แล้วค่อยขออนุมัติ commit แยกต่างหาก
+3. ทำ internal attachment workflow หลังยืนยัน storage integration; ยังไม่เชื่อม SharePoint อัตโนมัติจนกว่า CITCOMS อนุมัติ Graph API
+4. `staff_mobility` และ `staff_official_travel` ค่อยต่อยอดตาม category contract
 
 ## ข้อควรจำ
 
