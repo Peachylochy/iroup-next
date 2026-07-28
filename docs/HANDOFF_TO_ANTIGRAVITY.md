@@ -1,103 +1,61 @@
-# iROUP Next — Handoff to Antigravity
+# iROUP Next — Handoff
 
-อัปเดต: 27 กรกฎาคม 2569  
-Branch: `main`  
-Latest commit: `1743eb5 Merge pull request #2 from Peachylochy/agent/mou-app-shell`  
-Merged PR: `https://github.com/Peachylochy/iroup-next/pull/2`
+อัปเดต: 28 กรกฎาคม 2569
+Branch: `main` (`ccbb347` ก่อน handoff documentation นี้)
+Repository: `https://github.com/Peachylochy/iroup-next`
 
-## เริ่มจากตรงนี้
+## สถานะที่ส่งต่อ
 
-ระบบใหม่ iROUP ใช้ Next.js App Router + Supabase เพื่อแทน Apps Script ระบบเก่า
-MOU เป็นโมดูลแรกที่กำลัง build ตาม capability ของ legacy อย่างเป็นระบบ
+MOU ปิดรอบ core แล้ว: write workflow, multi-partner/unit contract, detail, internal-only attachment, list/search/filter/pagination และ CSV/XLSX export ถูก merge อยู่บน `main`
 
 - Local app: `http://localhost:3000`
-- MOU ใหม่: `http://localhost:3000/mou/new`
 - MOU list: `http://localhost:3000/mou`
-- องค์กรคู่ความร่วมมือ: `http://localhost:3000/mou/organizations`
-- Supabase project: `iroup-next` (`fefxzaxlfocqeuicjevv`)
+- MOU create: `http://localhost:3000/mou/new`
+- Partner organizations: `http://localhost:3000/mou/organizations`
+- User management: `http://localhost:3000/settings/users`
 
-ก่อนแก้ไขใด ๆ ให้ตรวจ `git status`, `git pull --ff-only origin main` และ `supabase migration list` ก่อน
+ก่อนเริ่มทุกครั้ง ให้รัน `git pull --ff-only origin main`, ตรวจ `git status` และ `pnpm.cmd exec supabase migration list`
 
-## สิ่งที่ทำเสร็จและยืนยันแล้ว
+## ข้อมูลทดสอบ Local เท่านั้น
 
-### MOU workflow และสิทธิ์
+- import MOU จาก legacy public API: 54 MOU (35 active, 19 expired), 46 partner organizations, 14 countries, 18 owner units
+- import PDF เฉพาะ 28 ไฟล์ที่ชื่อจับคู่ได้แบบ exact; อยู่ใน private bucket `mou-attachments`, link ผ่าน `assets`/`record_assets`, ทุกไฟล์ `is_public = false`
+- ชื่อไฟล์ที่คลุมเครือหรือไม่ตรงกันยังไม่ import และรอ manual review
+- ห้ามใส่ข้อมูลทดสอบหรือ PDF ใน Git และห้ามสรุปว่าเป็นข้อมูล production
 
-- การสร้าง/แก้ไขทำผ่าน guarded RPC เท่านั้น: draft → under review → published
-- Browser ถูกปิด direct write ไปยัง MOU และ relations
-- Editor บันทึกร่าง/ส่งตรวจได้; Publisher publish ได้; Viewer ถูกปฏิเสธ
-- ทุก transition มี `agreement_workflow_events`
+## ข้อตกลงที่ห้ามเปลี่ยนเอง
 
-### MOU form contract ที่ user อนุมัติ
+- MOU: end date optional, many partners/one lead, many UP units/one owner, country snapshot, soft delete/restore, no automatic file purge
+- MOU files และ partner contacts เป็น internal only; public portal ห้ามเห็น
+- Mobility กับ official travel ใช้ data core ร่วมกัน แต่แยก navigation, workflow และ permission boundary
+- RLS/RPC/Storage policy เป็น source of truth; UI hide อย่างเดียวไม่พอ
+- ห้ามแก้ legacy source `D:\---------ONLY PEACH----------\Peachylochy_iroup-portal`
 
-- วันสิ้นสุดไม่บังคับ; ถ้ามีต้องไม่ก่อนวันเริ่ม
-- รองรับหลายองค์กรคู่สัญญา แต่ต้องมี `lead` หนึ่งองค์กร
-- รองรับหลายหน่วยงาน ม.พะเยา แต่ต้องมี `owner` หนึ่งหน่วยงาน
-- ประเทศดึงจาก partner master และ snapshot ไว้เมื่อผูก MOU
-- MOU ไฟล์เป็น internal เท่านั้น; ห้าม expose ใน public portal
-- พันธมิตร `pending_verification` ส่งตรวจได้ แต่ทุก partner ต้อง `verified` ก่อน publish
-- ปีงบประมาณไทยคำนวณจากวันเริ่ม (ตุลาคมเริ่มปีงบประมาณใหม่)
-- Delete เป็น soft delete; System Admin restore ได้ และไม่มี automatic file purge
+## เอกสารที่ต้องอ่านก่อนเริ่มงาน
 
-### Migration ล่าสุด
+1. `docs/PROJECT_STATE.md` — สถานะล่าสุด
+2. `docs/LEGACY_FUNCTION_INVENTORY.md` — baseline ระบบเก่า
+3. `docs/MOU_PRESERVE_IMPROVE_RETIRE_MATRIX.md` และ `docs/MOU_WRITE_WORKFLOW.md`
+4. `docs/MOU_ANALYTICS_SCOPE.md` — ขอบเขต analytics รอบถัดไป
+5. `docs/MOBILITY_PRESERVE_IMPROVE_RETIRE_MATRIX.md` — ต้อง review ก่อนเริ่ม Mobility/Travel
+6. `docs/architecture/01-users-and-permissions.md` และ `02-domain-model.md`
 
-Migrations ล่าสุดถูก apply ทั้ง local และ remote แล้ว:
+## งานถัดไปตามลำดับ
 
-- `20260727075135_mou_legacy_field_contract`
-- partner/country snapshots และ country source/override contract
-- fiscal-year trigger
-- review/publish validation ที่เข้มขึ้น
-- MOU attachment metadata ไม่ให้ anon เห็น
-- RPC `mou_soft_delete` และ `mou_restore`
-- `20260727084026_remove_mou_file_retention`
-- ยืนยันว่าไม่มี automatic file purge หรือ deadline สำหรับ restore
+1. MOU analytics: KPI, renewal queue, owner-unit/country aggregate และ drill-down ไป `/mou`; Admin ไม่มี interactive map
+2. ทบทวน Mobility matrix กับเจ้าของระบบ แล้วสร้าง field mapping/import contract ของ Mobility และ official travel แยกกัน
+3. หลัง matrix อนุมัติเท่านั้น: movement migration → RLS/RPC → pgTAP → list/detail/form → participant/budget/files/import
+4. Public Portal/map เป็น phase แยกด้วย public-safe DTO; ห้ามเผยไฟล์ MOU, contacts, notes หรือ PII
 
-## เอกสารที่ต้องยึด
-
-1. `docs/LEGACY_FUNCTION_INVENTORY.md` — baseline ฟังก์ชันจากระบบเก่า
-2. `docs/MOU_PRESERVE_IMPROVE_RETIRE_MATRIX.md` — ข้อกำหนด MOU ที่ user อนุมัติแล้ว
-3. `docs/MOU_WRITE_WORKFLOW.md` — สถานะ/สิทธิ์/UX workflow
-4. `docs/PROJECT_STATE.md` — state ล่าสุด
-5. `docs/LEGACY_ASSET_LIBRARY.md` — assets จาก legacy ที่ import แล้ว; ใช้ได้เมื่อจำเป็น
-
-ห้าม build Mobility/Travel ก่อนทำ matrix ของโมดูลนั้นตามกติกาใน legacy inventory
-
-## งานถัดไปที่ต้องทำ: MOU detail + attachments
-
-ทำตามลำดับนี้:
-
-1. ออกแบบ/ทำ migration สำหรับ MOU file attachment โดย reuse `assets` และ `record_assets`
-2. สร้าง private Storage bucket/policies และ upload/download ผ่าน signed URL สำหรับผู้มีสิทธิ์ MOU เท่านั้น
-3. ทำหน้า `/mou/[id]` detail: ข้อมูล MOU, partners/units snapshots, files, workflow timeline และ action ตาม role
-4. เพิ่ม RLS/RPC/Storage tests แล้วค่อยทำ UI
-
-### ขอบเขตไฟล์ปัจจุบัน
-
-ไม่มี automatic file purge หรือ scheduled worker ใน scope ปัจจุบัน. ไฟล์ MOU เป็น internal
-เท่านั้นและคงอยู่หลัง soft delete จนกว่าจะมีนโยบาย records-retention ใหม่ที่ user อนุมัติ.
-ห้ามเพิ่ม service role key ใน client หรือ Git.
-
-## Verification ที่ต้องรันก่อน handoff กลับ
+## Verification ขั้นต่ำก่อนส่งกลับ
 
 ```powershell
-pnpm.cmd exec supabase db reset --local --no-seed --yes
-pnpm.cmd exec supabase test db --local supabase/tests/mou_write_workflow_test.sql supabase/tests/mou_legacy_field_contract_test.sql
 pnpm.cmd lint
 pnpm.cmd typecheck
 pnpm.cmd build
-pnpm.cmd exec supabase db advisors
+pnpm.cmd exec supabase test db --local
+pnpm.cmd exec supabase migration list
+git status --short --branch
 ```
 
-สถานะล่าสุดก่อน handoff นี้:
-
-- pgTAP: 17/17 ผ่าน
-- ESLint / TypeScript / production build: ผ่าน
-- Local และ remote DB advisor: ไม่พบ issue
-- Remote migration list มีถึง `20260727084026`
-
-## ความปลอดภัยและขอบเขต
-
-- ผู้ติดต่อองค์กรต่างประเทศเป็นข้อมูลภายใน ห้าม public
-- RLS/RPC เป็น source of truth ของสิทธิ์; ห้ามพึ่งการซ่อนปุ่มอย่างเดียว
-- อย่าแก้ legacy source ที่ `D:\---------ONLY PEACH----------\Peachylochy_iroup-portal`
-- อย่านำข้อมูล mobility Excel ไปปนกับ partner/contact data
-- ห้าม commit password, service role key หรือข้อมูลผู้ติดต่อจริง
+อย่า commit password, service role key, `.env.local`, ข้อมูลผู้ติดต่อจริง หรือไฟล์ใน `assets/`
