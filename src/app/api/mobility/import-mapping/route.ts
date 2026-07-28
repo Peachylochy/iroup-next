@@ -17,7 +17,15 @@ const unitSchema = z.object({
   nameEn: z.string().trim().max(500).optional(),
 });
 
-const payloadSchema = z.discriminatedUnion("kind", [partnerSchema, unitSchema]);
+const countrySchema = z.object({
+  kind: z.literal("country"),
+  iso2: z.string().trim().regex(/^[A-Za-z]{2}$/),
+  iso3: z.string().trim().regex(/^[A-Za-z]{3}$/),
+  nameTh: z.string().trim().min(1).max(500),
+  nameEn: z.string().trim().min(1).max(500),
+});
+
+const payloadSchema = z.discriminatedUnion("kind", [partnerSchema, unitSchema, countrySchema]);
 
 export async function POST(request: Request) {
   const access = await getCurrentUserAccess();
@@ -45,6 +53,30 @@ export async function POST(request: Request) {
     if (error) return NextResponse.json({ error: error.message.includes("DUPLICATE") ? "พบองค์กรชื่อเดียวกันแล้ว กรุณาเลือกรายการเดิม" : "สร้างองค์กรไม่สำเร็จ" }, { status: 400 });
     const saved = data as { id: string; verification_status: string };
     return NextResponse.json({ id: saved.id, nameTh: payload.nameTh || null, nameEn: payload.nameEn || null, verificationStatus: saved.verification_status });
+  }
+
+  if (payload.kind === "country") {
+    if (!access.roles.includes("system_admin")) return NextResponse.json({ error: "เฉพาะ System Admin เท่านั้นที่เพิ่มประเทศได้" }, { status: 403 });
+    const { data, error } = await supabase
+      .from("countries")
+      .insert({
+        iso2: payload.iso2.toUpperCase(),
+        iso3: payload.iso3.toUpperCase(),
+        name_th: payload.nameTh,
+        name_en: payload.nameEn,
+      })
+      .select("id, iso2, iso3, name_th, name_en")
+      .single();
+    if (error) {
+      console.error("Unable to create country from mobility import mapping", error);
+      const message = error.code === "23505"
+        ? "พบประเทศหรือรหัส ISO นี้แล้ว กรุณาเลือกข้อมูลเดิม"
+        : error.code === "42501"
+          ? "บัญชีนี้ไม่มีสิทธิ์เพิ่มประเทศ"
+          : "สร้างประเทศไม่สำเร็จ กรุณาลองใหม่หรือติดต่อผู้ดูแลระบบ";
+      return NextResponse.json({ error: message }, { status: 400 });
+    }
+    return NextResponse.json({ id: data.id, iso2: data.iso2, iso3: data.iso3, nameTh: data.name_th, nameEn: data.name_en });
   }
 
   if (!access.roles.includes("system_admin")) return NextResponse.json({ error: "เฉพาะ System Admin เท่านั้นที่เพิ่มหน่วยงาน ม.พะเยาได้" }, { status: 403 });
