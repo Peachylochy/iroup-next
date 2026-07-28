@@ -39,13 +39,15 @@ MOU ปิดรอบ core แล้ว: write workflow, multi-partner/unit con
 4. `docs/MOU_ANALYTICS_SCOPE.md` — ขอบเขต analytics รอบถัดไป
 5. `docs/MOBILITY_PRESERVE_IMPROVE_RETIRE_MATRIX.md` — ต้อง review ก่อนเริ่ม Mobility/Travel
 6. `docs/architecture/01-users-and-permissions.md` และ `02-domain-model.md`
+7. `docs/SHAREPOINT_STORAGE_DECISION.md` — การตัดสินใจและ guardrail ของไฟล์จริง
 
 ## งานถัดไปตามลำดับ
 
-1. MOU analytics: KPI, renewal queue, owner-unit/country aggregate และ drill-down ไป `/mou`; Admin ไม่มี interactive map
-2. ทบทวน Mobility matrix กับเจ้าของระบบ แล้วสร้าง field mapping/import contract ของ Mobility และ official travel แยกกัน
-3. หลัง matrix อนุมัติเท่านั้น: movement migration → RLS/RPC → pgTAP → list/detail/form → participant/budget/files/import
-4. Public Portal/map เป็น phase แยกด้วย public-safe DTO; ห้ามเผยไฟล์ MOU, contacts, notes หรือ PII
+1. รอแนวทาง CITCOMS เรื่อง Microsoft Graph แล้วทำ SharePoint storage provider สำหรับ MOU attachments; ห้ามใส่ Microsoft credentials ใน Git
+2. MOU analytics: KPI, renewal queue, owner-unit/country aggregate และ drill-down ไป `/mou`; Admin ไม่มี interactive map
+3. ทบทวน Mobility matrix กับเจ้าของระบบ แล้วสร้าง field mapping/import contract ของ Mobility และ official travel แยกกัน
+4. หลัง matrix อนุมัติเท่านั้น: movement migration → RLS/RPC → pgTAP → list/detail/form → participant/budget/files/import
+5. Public Portal/map เป็น phase แยกด้วย public-safe DTO; ห้ามเผยไฟล์ MOU, contacts, notes หรือ PII
 
 ## Verification ขั้นต่ำก่อนส่งกลับ
 

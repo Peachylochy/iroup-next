@@ -86,6 +86,14 @@ iROUP Next เป็นระบบใหม่ที่พัฒนาด้ว
   การล็อกสิทธิ์บัญชีตัวเอง และ viewport 390px
 - Browser console ไม่พบ error หรือ warning ที่เกี่ยวข้อง
 
+## SharePoint Storage
+
+- สร้าง SharePoint Site ภายใน `iROUP Portal` ที่ `https://liveupac.sharepoint.com/iroup` พร้อม unique permissions แล้ว
+- สร้าง Document Library `iROUP MOU Internal Documents` สำหรับไฟล์ MOU ภายใน
+- ตัดสินใจใช้ SharePoint เก็บไฟล์จริง และใช้ Supabase เก็บข้อมูล MOU, สิทธิ์, workflow และ metadata
+- ส่งคำขอถึง CITCOMS เพื่อขอแนวทาง/อนุญาตการเชื่อม Microsoft Graph แบบจำกัดสิทธิ์เฉพาะ Site นี้แล้ว; รอคำตอบก่อน implement integration
+- ดูรายละเอียดและ guardrails ที่ `docs/SHAREPOINT_STORAGE_DECISION.md`
+
 ## GitHub
 
 - Repository: `Peachylochy/iroup-next`
@@ -97,9 +105,10 @@ iROUP Next เป็นระบบใหม่ที่พัฒนาด้ว
 
 ## จุดเริ่มงานครั้งถัดไป
 
-1. Review `docs/MOU_ANALYTICS_SCOPE.md`, then implement MOU KPI/renewal/owner-unit analytics with RLS-tested aggregates and drill-down filters.
-2. Review `docs/MOBILITY_PRESERVE_IMPROVE_RETIRE_MATRIX.md` before implementing Mobility or official travel.
-3. After matrix approval, inspect legacy field/API contracts and write the Movement migration/RLS/RPC/test plan before UI work.
+1. รอแนวทาง CITCOMS เรื่อง Microsoft Graph แล้ว implement SharePoint storage provider สำหรับ MOU attachments ตามสิทธิ์ที่อนุมัติ
+2. Review `docs/MOU_ANALYTICS_SCOPE.md`, then implement MOU KPI/renewal/owner-unit analytics with RLS-tested aggregates and drill-down filters.
+3. Review `docs/MOBILITY_PRESERVE_IMPROVE_RETIRE_MATRIX.md` before implementing Mobility or official travel.
+4. After matrix approval, inspect legacy field/API contracts and write the Movement migration/RLS/RPC/test plan before UI work.
 
 ## ข้อควรจำ
 
