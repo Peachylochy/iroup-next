@@ -6,5 +6,5 @@ export default async function StudentMobilityImportPage() {
   const access = await getCurrentUserAccess();
   if (!access) redirect("/login");
   if (!hasWorkspaceAccess(access) || !access.modules.mobility?.import) redirect("/mobility");
-  return <MobilityImportPreviewWorkspace />;
+  return <MobilityImportPreviewWorkspace access={access} />;
 }

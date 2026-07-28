@@ -1566,6 +1566,126 @@
     flex-direction: column;
   }
 
+  .mobility-import-row {
+    border-bottom: 1px solid var(--border);
+    padding: 18px 20px;
+  }
+
+  .mobility-import-row:last-child {
+    border-bottom: 0;
+  }
+
+  .mobility-import-row-header {
+    display: grid;
+    grid-template-columns: 34px minmax(0, 1fr) auto;
+    align-items: start;
+    gap: 12px;
+  }
+
+  .mobility-import-summary {
+    min-width: 0;
+  }
+
+  .mobility-import-summary strong {
+    display: block;
+    font-size: 13px;
+    font-weight: 650;
+    line-height: 1.45;
+  }
+
+  .mobility-import-summary p,
+  .mobility-import-summary small {
+    display: block;
+    margin-top: 3px;
+    color: var(--muted-foreground);
+    font-size: 10px;
+    line-height: 1.45;
+  }
+
+  .mobility-import-issues,
+  .mobility-import-resolved {
+    max-width: 960px;
+    margin: 10px 0 0 46px;
+    font-size: 11px;
+    line-height: 1.55;
+  }
+
+  .mobility-import-issues { color: var(--muted-foreground); }
+  .mobility-import-resolved { color: oklch(0.48 0.13 155); }
+  .mobility-import-follow-up {
+    max-width: 960px;
+    margin: 10px 0 0 46px;
+    color: oklch(0.58 0.16 62);
+    font-size: 11px;
+    line-height: 1.55;
+  }
+
+  .mobility-import-fields {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    max-width: 1050px;
+    gap: 12px;
+    margin: 12px 0 0 46px;
+    padding: 14px;
+    border: 1px solid color-mix(in oklch, var(--border), var(--primary) 15%);
+    border-radius: 10px;
+    background: color-mix(in oklch, var(--secondary), transparent 48%);
+  }
+
+  .mobility-import-fields label,
+  .mobility-import-create-form label {
+    display: grid;
+    gap: 5px;
+    min-width: 0;
+    font-size: 11px;
+  }
+
+  .mobility-import-fields label > strong { font-size: 11px; }
+
+  .mobility-import-fields select,
+  .mobility-import-fields input,
+  .mobility-import-create-form input,
+  .mobility-import-create-form select {
+    width: 100%;
+    min-width: 0;
+    height: 36px;
+    border: 1px solid var(--input);
+    border-radius: 7px;
+    background: var(--background);
+    padding: 0 10px;
+    font: inherit;
+    font-size: 11px;
+  }
+
+  .mobility-import-control {
+    display: flex;
+    min-width: 0;
+    gap: 7px;
+  }
+
+  .mobility-import-control select { flex: 1; }
+
+  .mobility-import-create {
+    grid-column: 1 / -1;
+    border-top: 1px solid color-mix(in oklch, var(--border), var(--primary) 15%);
+    padding-top: 14px;
+  }
+
+  .mobility-import-create h3 { font-size: 13px; font-weight: 650; }
+  .mobility-import-create p { margin-top: 3px; color: var(--muted-foreground); font-size: 10px; }
+
+  .mobility-import-create-form {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    max-width: 680px;
+  }
+
+  .mobility-import-create-form .is-wide,
+  .mobility-import-create-actions { grid-column: 1 / -1; }
+
+  .mobility-import-create-actions { display: flex; gap: 8px; }
+
   .mou-row {
     display: grid;
     min-width: 0;
@@ -1779,6 +1899,20 @@
     padding-right: 14px;
     padding-left: 14px;
   }
+
+  .mobility-import-row { padding: 15px 14px; }
+  .mobility-import-row-header { grid-template-columns: 34px minmax(0, 1fr); }
+  .mobility-import-row-header > .badge { grid-column: 2; justify-self: start; }
+  .mobility-import-issues,
+  .mobility-import-resolved,
+  .mobility-import-follow-up,
+  .mobility-import-fields { margin-left: 0; }
+  .mobility-import-fields { grid-template-columns: 1fr; padding: 12px; }
+  .mobility-import-control { flex-direction: column; }
+  .mobility-import-control > button { align-self: flex-start; }
+  .mobility-import-create-form { grid-template-columns: 1fr; }
+  .mobility-import-create-form .is-wide,
+  .mobility-import-create-actions { grid-column: auto; }
 
   .mou-row {
     grid-template-columns: 34px minmax(0, 1fr) auto;

@@ -107,8 +107,8 @@ iROUP Next เป็นระบบใหม่ที่พัฒนาด้ว
 
 ## จุดเริ่มงานครั้งถัดไป
 
-1. ทดสอบและ review Import Preview ของ Mobility นิสิตจาก `IROUP_DATABASE_PRODUCTION.xlsx`: แยก 27 โครงการ/182 นิสิตออกจาก Travel และ flag โครงการ mixed ที่มีบุคลากร 2 คน; ไม่มี commit ข้อมูลจริง
-2. หลังยืนยันผล preview ให้สร้าง staging batch/review ที่เลือกเฉพาะรายการผ่านการตรวจ แล้วค่อยขออนุมัติ commit แยกต่างหาก
+1. ตรวจ Mapping ของ Mobility นิสิตจาก `IROUP_DATABASE_PRODUCTION.xlsx`: หน้าตรวจนำเข้ากรองสีส้ม/แดงได้, เลือกประเทศ/องค์กร/หน่วยงานอ้างอิงได้ และสร้างองค์กรแบบ `pending_verification` หรือหน่วยงานโดย System Admin ได้; การเลือก mapping ยังอยู่ใน browser และยังไม่มี staging batch หรือ commit ข้อมูลจริง
+2. เมื่อเจ้าหน้าที่ตรวจและเลือก mapping ครบ ให้สร้าง staging batch/review ที่บันทึกเฉพาะรายการและ mapping ที่ผ่านการตรวจ แล้วค่อยขออนุมัติ commit แยกต่างหาก
 3. ทำ internal attachment workflow หลังยืนยัน storage integration; ยังไม่เชื่อม SharePoint อัตโนมัติจนกว่า CITCOMS อนุมัติ Graph API
 4. `staff_mobility` และ `staff_official_travel` ค่อยต่อยอดตาม category contract
 

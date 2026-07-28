@@ -14,9 +14,9 @@ export async function POST(request: Request) {
   if (file.size > 10 * 1024 * 1024) return NextResponse.json({ error: "ไฟล์ต้องมีขนาดไม่เกิน 10 MB" }, { status: 400 });
   const supabase = await createClient();
   const [countries, units, partners] = await Promise.all([
-    supabase.from("countries").select("iso2, name_th, name_en").eq("active", true),
-    supabase.from("organization_units").select("code, name_th, name_en").eq("active", true),
-    supabase.from("partner_organizations").select("legacy_id, name_th, name_en").eq("active", true),
+    supabase.from("countries").select("id, iso2, name_th, name_en").eq("active", true).order("name_th"),
+    supabase.from("organization_units").select("id, code, name_th, name_en").eq("active", true).order("name_th"),
+    supabase.from("partner_organizations").select("id, legacy_id, name_th, name_en").eq("active", true).order("name_en"),
   ]);
   if (countries.error || units.error || partners.error) return NextResponse.json({ error: "อ่านข้อมูลอ้างอิงจากระบบไม่สำเร็จ" }, { status: 500 });
   try {

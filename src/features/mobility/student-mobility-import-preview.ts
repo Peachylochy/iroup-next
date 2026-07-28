@@ -2,10 +2,12 @@ import ExcelJS from "exceljs";
 
 type Row = Record<string, string>;
 type Lookup = {
-  countries: Array<{ iso2: string; name_th: string; name_en: string }>;
-  units: Array<{ code: string | null; name_th: string; name_en: string | null }>;
-  partners: Array<{ legacy_id: string | null; name_th: string | null; name_en: string }>;
+  countries: Array<{ id: string; iso2: string; name_th: string; name_en: string }>;
+  units: Array<{ id: string; code: string | null; name_th: string; name_en: string | null }>;
+  partners: Array<{ id: string; legacy_id: string | null; name_th: string | null; name_en: string | null }>;
 };
+
+export type StudentMobilityImportReferenceOptions = Lookup;
 
 export type StudentMobilityImportRow = {
   sourceRow: number;
@@ -16,6 +18,11 @@ export type StudentMobilityImportRow = {
   endDate: string;
   studentParticipants: number;
   staffParticipants: number;
+  sourceCountry: { id: string; name: string; iso2: string } | null;
+  sourceUnit: { id: string; name: string; code: string } | null;
+  needsCountryMapping: boolean;
+  needsUnitMapping: boolean;
+  needsPartnerMapping: boolean;
   result: "ready" | "warning" | "error";
   messages: string[];
 };
@@ -28,6 +35,7 @@ export type StudentMobilityImportPreview = {
   errorProjects: number;
   studentParticipants: number;
   excludedStaffParticipants: number;
+  referenceOptions: StudentMobilityImportReferenceOptions;
   rows: StudentMobilityImportRow[];
 };
 
@@ -80,9 +88,12 @@ export async function previewStudentMobilityImport(file: File, lookup: Lookup): 
     if (!project.project_name) messages.push("ไม่มีชื่อโครงการ");
     if (!project.start_date) messages.push("ไม่มีวันเริ่มเดินทาง");
     if (!students.length) messages.push("ไม่พบผู้เข้าร่วมนิสิต");
-    if (!sourceCountry?.iso2 || !targetCountryIso2.has(sourceCountry.iso2.toUpperCase())) messages.push("ยังจับคู่ประเทศกับฐานใหม่ไม่ได้");
-    if (!sourceUnit?.unit_code || !targetUnitCodes.has(sourceUnit.unit_code.toUpperCase())) messages.push("ยังจับคู่หน่วยงาน ม.พะเยากับฐานใหม่ไม่ได้");
-    if (project.institution_name && !targetPartners.has(normalize(project.institution_name))) messages.push("ยังไม่พบองค์กรคู่ความร่วมมือในฐานใหม่");
+    const needsCountryMapping = !sourceCountry?.iso2 || !targetCountryIso2.has(sourceCountry.iso2.toUpperCase());
+    const needsUnitMapping = !sourceUnit?.unit_code || !targetUnitCodes.has(sourceUnit.unit_code.toUpperCase());
+    const needsPartnerMapping = Boolean(project.institution_name && !targetPartners.has(normalize(project.institution_name)));
+    if (needsCountryMapping) messages.push("ยังจับคู่ประเทศกับฐานใหม่ไม่ได้");
+    if (needsUnitMapping) messages.push("ยังจับคู่หน่วยงาน ม.พะเยากับฐานใหม่ไม่ได้");
+    if (needsPartnerMapping) messages.push("ยังไม่พบองค์กรคู่ความร่วมมือในฐานใหม่");
     if (staff.length) messages.push(`มีบุคลากร ${staff.length} คน — ไม่รวมใน Mobility นิสิต`);
     const errors = messages.filter((message) => /ไม่มี|ยังจับคู่/.test(message));
     return {
@@ -94,6 +105,19 @@ export async function previewStudentMobilityImport(file: File, lookup: Lookup): 
       endDate: project.end_date,
       studentParticipants: students.length,
       staffParticipants: staff.length,
+      sourceCountry: sourceCountry ? {
+        id: project.country_id || sourceCountry.country_id || "",
+        name: sourceCountry.country_name_th || sourceCountry.country_name_en || sourceCountry.country_name || sourceCountry.iso2 || "ไม่ระบุประเทศ",
+        iso2: sourceCountry.iso2 || "",
+      } : null,
+      sourceUnit: sourceUnit ? {
+        id: project.up_unit_id || sourceUnit.unit_id || "",
+        name: sourceUnit.unit_name_th || sourceUnit.unit_name_en || sourceUnit.unit_name || sourceUnit.unit_code || "ไม่ระบุหน่วยงาน",
+        code: sourceUnit.unit_code || "",
+      } : null,
+      needsCountryMapping,
+      needsUnitMapping,
+      needsPartnerMapping,
       result: errors.length ? "error" : messages.length ? "warning" : "ready",
       messages,
     } satisfies StudentMobilityImportRow;
@@ -106,6 +130,7 @@ export async function previewStudentMobilityImport(file: File, lookup: Lookup): 
     errorProjects: rows.filter((row) => row.result === "error").length,
     studentParticipants: rows.reduce((total, row) => total + row.studentParticipants, 0),
     excludedStaffParticipants: rows.reduce((total, row) => total + row.staffParticipants, 0),
+    referenceOptions: lookup,
     rows,
   };
 }
