@@ -89,15 +89,15 @@ iROUP Next เป็นระบบใหม่ที่พัฒนาด้ว
 ## GitHub
 
 - Repository: `Peachylochy/iroup-next`
-- Main includes PR #1 `1dcfb4a`, PR #2 `1743eb5`, and PR #4 `d06610c` (MOU detail + internal attachments).
-- PR #5 (`agent/fix-search-spacing`) remains a separate small UI-fix PR and has not been merged yet.
-- Current branch: `agent/mou-list-filter-export` (pending PR).
-- Current work: MOU list filtering, pagination, and CSV/XLSX export. Mobility remains out of scope until its legacy matrix is approved.
-- Local sample MOU/partner/master records were intentionally removed on 28 July 2569; the linked production project is also empty of sample records.
+- Main includes PR #1 `1dcfb4a`, PR #2 `1743eb5`, PR #4 `d06610c` (MOU detail + internal attachments), and PR #5 `6f7d4b4` (search label spacing).
+- Current branch: `agent/mou-list-filter-export` (PR #6, ready to merge after this state update).
+- Local test data now uses 54 MOU records imported from the legacy public MOU API: 35 active, 19 expired, 46 partner organizations, 14 countries, and 18 owner units. This data is Local only and is not part of Git history or the linked production project.
+- Imported 28 PDF attachments whose filename had a one-to-one, exact organization match. They are in the private `mou-attachments` bucket, linked through `assets`/`record_assets`, and have `is_public = false`. The remaining files require manual matching and were not imported.
+- MOU list filtering, pagination, CSV/XLSX export, and private attachment display have been verified against the Local legacy dataset. Mobility remains out of scope until its legacy matrix is approved.
 
 ## จุดเริ่มงานครั้งถัดไป
 
-1. Review and merge the focused MOU list/filter/export PR; keep PR #5 separate or merge it first as a small UI fix.
+1. Merge PR #6 to complete the MOU list/filter/export delivery.
 2. Build MOU map + owner-unit analytics after list/filter/export is complete.
 3. Create the Mobility preserve/improve/retire matrix before implementing Mobility.
 
