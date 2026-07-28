@@ -30,6 +30,7 @@ type WorkspaceChromeProps = {
   activePath?: string;
   query?: string;
   onQueryChange?: (query: string) => void;
+  searchPlaceholder?: string;
   children: React.ReactNode;
 };
 
@@ -51,6 +52,7 @@ export function WorkspaceChrome({
   activePath = "/",
   query = "",
   onQueryChange,
+  searchPlaceholder = "ค้นหาข้อมูล",
   children,
 }: WorkspaceChromeProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -114,10 +116,10 @@ export function WorkspaceChrome({
             {onQueryChange ? (
               <label className="search-control">
                 <Search aria-hidden="true" />
-                <span className="sr-only">ค้นหาข้อมูล</span>
+                <span className="sr-only">{searchPlaceholder}</span>
                 <Input
                   type="search"
-                  placeholder="ค้นหาข้อมูล"
+                  placeholder={searchPlaceholder}
                   value={query}
                   onChange={(event) => onQueryChange(event.target.value)}
                 />
