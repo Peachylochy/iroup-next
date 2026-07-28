@@ -67,7 +67,39 @@
 6. auto fiscal year และ derived expiring status
 7. delete/soft-delete workflow
 
-## 3. โมดูลอื่น: capability matrix
+## 3. Mobility — matrix จากระบบเก่า (ต้องเทียบก่อน build ต่อ)
+
+แหล่งอ้างอิง: `Team IROUP/mobility.html`, `IROUP_V2_DTO_LOOKUP.gs`,
+`IROUP_V2_ADMIN_API.gs` และ `IROUP-MASTER-CONCEPT.md`.
+
+| กลุ่มงานเดิม | พฤติกรรมที่ตรวจพบ | แนวทางสำหรับ Next | สถานะ |
+|---|---|---|---|
+| Master ประเทศ/หน่วยงาน | ใช้ `input` + `datalist`; พิมพ์ค้นหาได้ แล้ว `sync...IdFromInput()` จับคู่ hidden ID | เปลี่ยน dropdown บังคับเลือกเป็น combobox/autocomplete ที่ค้นหาได้; เพิ่ม master เฉพาะกรณีไม่พบจริง | ต้องแก้ UI import และฟอร์มหลัก |
+| Master นิสิต/บุคลากร | lookup แยก `students` และ `staff`; Mobility outbound ดึงนิสิตเป็นหลัก | นำเข้า master ภายในแบบ staged และให้ค้นหาแบบ server-side; ห้ามโหลดรายชื่อทั้งหมดเข้าสู่ browser | ต้องออกแบบ master import |
+| รายการ Mobility | list/detail, card/table view, search/filter ปีงบประมาณ และ refresh | รักษา list/detail/filter; table/card เป็น enhancement หลัง workflow หลัก | List/Detail บางส่วนมีแล้ว |
+| โครงการ | create/update/delete, inbound/outbound, ประเทศ, เมือง, หน่วยงาน, purpose, level, กลุ่มผู้เข้าร่วม, วันที่, ปีงบประมาณ, counters, status/public | ทำ schema/workflow ที่รองรับ field เหล่านี้ครบก่อน import จริง | ต้องตรวจ field matrix |
+| ผู้เข้าร่วม | ค้นหารายคน, เพิ่ม/ลบ, เพิ่มหลายรหัส (สูงสุด 200), preview ก่อนบันทึก | รักษา individual search + batch resolve/preview/commit | Stage 1/RPC มีบางส่วน |
+| นิสิตไม่มีใน master | วางข้อมูลจาก Excel แล้ว `studentresolvebatch` ตรวจ/สร้างเป็น batch | ต้องมี staged person import และ error review; ไม่สร้างคนแบบเงียบ ๆ ระหว่าง import โครงการ | ยังไม่ทำ |
+| บุคคล manual/inbound | เพิ่ม person manual พร้อมชื่อ เพศ หน่วยงาน หลักสูตร/ตำแหน่ง | เก็บเป็น internal person/manual participant แยกจาก student/staff master | ยังไม่ทำ |
+| งบประมาณ | อ่าน/บันทึก budget ของโครงการ | สร้าง relation budget หลัง project/participant workflow ผ่าน | ยังไม่ทำ |
+| Public | list/map/summary เผยแพร่เฉพาะข้อมูล aggregate ไม่รวมชื่อผู้เข้าร่วม | ทำภายหลัง และห้ามเปิดข้อมูลบุคคล | ยังไม่ทำ |
+
+### 3.1 กติกา master ที่ต้องรักษา
+
+- `COUNTRY_MASTER` และ `UP_UNIT_MASTER` เป็น master กลางของทุกโมดูล ไม่ใช่ข้อมูลเฉพาะ Mobility
+- `PERSON_STUDENT` ใช้กับ Mobility; `PERSON_STAFF` ใช้กับการเดินทางไปปฏิบัติงาน
+- การค้นหา master ต้องรองรับชื่อไทย อังกฤษ และรหัส; ผู้ใช้เลือก record ที่มี ID แล้วจึงบันทึก
+- การเพิ่ม master ใหม่เป็น exception ที่มีสิทธิ์กำกับ ไม่ใช่ทางหลักเมื่อมีไฟล์ master อยู่แล้ว
+- Public API ต้องส่งเฉพาะสถิติ/ข้อมูลโครงการที่อนุมัติ ไม่ส่งรายชื่อหรือข้อมูลติดต่อ
+
+### 3.2 ลำดับก่อนทำ Mobility ต่อ
+
+1. ทำ field/workflow matrix ของ `MOBILITY_PROJECT` และ `MOBILITY_PARTICIPANT` เทียบ legacy กับ Supabase schema ทีละ field
+2. ออกแบบและทดสอบ staged import ของ country, unit, student, staff และ partner master จากไฟล์ master
+3. เปลี่ยน form/import mapping ให้ใช้ autocomplete จาก master ที่นำเข้าแล้ว
+4. จึงสร้าง staging batch สำหรับข้อมูล Mobility และให้เจ้าหน้าที่ review/commit แยกต่างหาก
+
+## 4. โมดูลอื่น: capability matrix
 
 | โมดูล | อ่าน/วิเคราะห์ | เขียน | ไฟล์/ความสัมพันธ์ | Public |
 |---|---|---|---|---|
@@ -80,7 +112,7 @@
 | รายงาน | report summary fiscal year, trend, breakdown, export table | ไม่มี record write | export | summary ที่อนุมัติ |
 | Dashboard | dashboard summary, KPI, charts, alerts | ไม่มี record write โดยตรง | deep links ไป module | stats |
 
-## 4. Exact V2 API capability registry
+## 5. Exact V2 API capability registry
 
 ### Platform / auth / lookup
 
@@ -117,7 +149,7 @@
 - Knowledge: `admin.list/detail/create/update/delete`, `public.list`
 - Dashboard/report: `v2.admin.dashboard.summary`, `v2.admin.report.summary`, `v2.public.stats`
 
-## 5. Security and data rules observed in legacy system
+## 6. Security and data rules observed in legacy system
 
 - Admin session is Google-account based in Apps Script; V2 write/read admin actions require authenticated request.
 - Public APIs emit sanitized DTOs, not raw admin records.
@@ -125,7 +157,7 @@
 - V2 supports soft-delete filtering and audit log concepts.
 - Partner contacts are private information and must never become a public organization directory.
 
-## 6. Build procedure from now on
+## 7. Build procedure from now on
 
 For every next module:
 
@@ -135,7 +167,7 @@ For every next module:
 4. Implement schema/RLS/RPC/tests first, then list/detail/form/attachments/export.
 5. Add regression tests for every capability marked preserve or improve.
 
-## 7. Current Next implementation coverage
+## 8. Current Next implementation coverage
 
 | Area | Status |
 |---|---|
@@ -145,7 +177,7 @@ For every next module:
 | Partner organization master + pending verification | built, incomplete (merge/dedupe review and private contacts pending) |
 | Mobility, travel, scholarship, events, news, knowledge, reports, public portal | **do not build until each has a reviewed module matrix** |
 
-## 8. Evidence paths
+## 9. Evidence paths
 
 - Legacy MOU UI/data operations: `Team IROUP/mou.html`
 - Legacy V2 browser API contract: `Team IROUP/js/iroup-v2-api.js`
