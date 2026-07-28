@@ -1242,6 +1242,71 @@
     color: var(--muted-foreground);
   }
 
+  .mou-advanced-filters {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 10px;
+    border-bottom: 1px solid var(--border);
+    padding: 14px 20px;
+  }
+
+  .mou-advanced-filters label {
+    display: grid;
+    gap: 5px;
+    color: var(--muted-foreground);
+    font-size: 10px;
+    font-weight: 600;
+  }
+
+  .mou-advanced-filters select,
+  .mou-advanced-filters input {
+    width: 100%;
+    min-width: 0;
+    height: 34px;
+    border: 1px solid var(--input);
+    border-radius: 7px;
+    background: var(--background);
+    padding: 0 9px;
+    color: var(--foreground);
+    font: inherit;
+    font-size: 11px;
+  }
+
+  .mou-advanced-filters > button {
+    align-self: end;
+    justify-self: start;
+  }
+
+  .mou-list-summary,
+  .mou-pagination,
+  .mou-export-actions {
+    display: flex;
+    align-items: center;
+  }
+
+  .mou-list-summary {
+    justify-content: space-between;
+    gap: 12px;
+    border-bottom: 1px solid var(--border);
+    padding: 11px 20px;
+    color: var(--muted-foreground);
+    font-size: 10px;
+  }
+
+  .mou-export-actions,
+  .mou-pagination > span:last-child {
+    gap: 7px;
+  }
+
+  .mou-pagination {
+    justify-content: space-between;
+    gap: 12px;
+    border-top: 1px solid var(--border);
+    padding: 12px 20px;
+    color: var(--muted-foreground);
+    font-size: 10px;
+  }
+
   .filter-pill {
     min-height: 28px;
     border: 1px solid transparent;
@@ -1465,6 +1530,17 @@
   .module-filter-row {
     overflow-x: auto;
     padding: 10px 14px;
+  }
+
+  .mou-advanced-filters {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    padding: 12px 14px;
+  }
+
+  .mou-list-summary,
+  .mou-pagination {
+    padding-right: 14px;
+    padding-left: 14px;
   }
 
   .mou-row {
