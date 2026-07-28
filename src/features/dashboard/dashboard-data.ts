@@ -45,13 +45,13 @@ export const navigationGroups = [
   },
   {
     label: "การเดินทางและ Mobility",
-    href: "#priority-work",
+    href: "/mobility",
     icon: Plane,
     module: "mobility",
     children: [
       {
         label: "Mobility นิสิต",
-        href: "#module-overview",
+        href: "/mobility",
         icon: GraduationCap,
         module: "mobility",
       },

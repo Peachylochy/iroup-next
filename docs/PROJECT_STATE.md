@@ -1,7 +1,7 @@
 # iROUP Next: Project State
 
 อัปเดตล่าสุด: 28 กรกฎาคม 2569
-สถานะ: MOU core, detail, private attachment, list/filter/export และ analytics ปิดรอบแล้ว; Mobility นิสิต Stage 1 ปิด migration/RLS/RPC/pgTAP แล้ว พร้อมเริ่ม UI
+สถานะ: MOU core, detail, private attachment, list/filter/export และ analytics ปิดรอบแล้ว; Mobility นิสิต Stage 1 ปิด migration/RLS/RPC/pgTAP และ List/Detail/Form UI แล้ว รอ review/merge
 
 > ก่อนสร้างโมดูลใหม่หรือขยาย MOU ให้ใช้ `docs/LEGACY_FUNCTION_INVENTORY.md`
 > เป็น baseline และทำ preserve/improve/retire matrix ของโมดูลนั้นก่อนเสมอ
@@ -84,10 +84,14 @@ iROUP Next เป็นระบบใหม่ที่พัฒนาด้ว
 - MOU list: `http://localhost:3000/mou`
 - MOU create: `http://localhost:3000/mou/new`
 - Partner organizations: `http://localhost:3000/mou/organizations`
+- Mobility student list: `http://localhost:3000/mobility`
+- Mobility student create: `http://localhost:3000/mobility/new`
 - ESLint ผ่าน
 - TypeScript ผ่าน
 - Next.js production build ผ่าน
 - Playwright regression tests ผ่าน 5/5
+- Browser QA ของ Mobility นิสิตผ่าน: เมนูเข้า list, empty state ไม่มีข้อมูลตัวอย่าง,
+  form ดึงประเทศ/องค์กร/หน่วยงานจากข้อมูลจริง และเพิ่มผู้เข้าร่วมแบบ dynamic ได้
 - Browser QA ผ่านทั้งการค้นหา เปิด Permission panel
   การล็อกสิทธิ์บัญชีตัวเอง และ viewport 390px
 - Browser console ไม่พบ error หรือ warning ที่เกี่ยวข้อง
@@ -103,7 +107,7 @@ iROUP Next เป็นระบบใหม่ที่พัฒนาด้ว
 
 ## จุดเริ่มงานครั้งถัดไป
 
-1. ทำ list/detail/form ของ Mobility นิสิตบน movement core เดียว โดยต่อกับ guarded RPC ที่ผ่าน test แล้ว
+1. Review และ merge หน้า List/Detail/Form ของ Mobility นิสิต; หน้า detail มี transition ตามสิทธิ์: ส่งกลับแก้ไข, อนุมัติ, เริ่มโครงการ และปิดโครงการ
 2. ทำ internal attachment workflow หลังยืนยัน storage integration; ยังไม่เชื่อม SharePoint อัตโนมัติจนกว่า CITCOMS อนุมัติ Graph API
 3. ทำ import preview/review สำหรับข้อมูล 407/408 แถว โดยยังไม่ commit จริง; `staff_mobility` และ `staff_official_travel` ค่อยต่อยอดตาม category contract
 
