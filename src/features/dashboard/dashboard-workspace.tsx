@@ -6,13 +6,19 @@ import {
   Bell,
   CalendarDays,
   ChevronDown,
+  ContactRound,
+  FileClock,
+  FilePenLine,
+  Handshake,
   LockKeyhole,
   LogOut,
   Menu,
+  Plane,
   Plus,
   Search,
   X,
 } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -82,36 +88,45 @@ function SectionHeading({
 
 function PriorityList({
   query,
-  liveMode = false,
+  snapshot,
 }: {
   query: string;
-  liveMode?: boolean;
+  snapshot?: DashboardSnapshot;
 }) {
   const visibleItems = useMemo(() => {
     const normalized = query.trim().toLocaleLowerCase("th");
-    if (!normalized) return priorityItems;
-    return priorityItems.filter((item) =>
+    const sourceItems = snapshot?.priorityItems || priorityItems;
+    if (!normalized) return sourceItems;
+    return sourceItems.filter((item) =>
       `${item.title} ${item.description} ${item.status}`
         .toLocaleLowerCase("th")
         .includes(normalized),
     );
-  }, [query]);
+  }, [query, snapshot]);
+
+  // Map string icon names to Lucide components
+  const iconMap: Record<string, LucideIcon> = {
+    FileClock,
+    FilePenLine,
+    Plane,
+    ContactRound,
+  };
 
   return (
     <section className="priority-section" aria-labelledby="priority-work">
       <SectionHeading id="priority-work">งานที่ต้องดำเนินการ</SectionHeading>
       <div className="priority-list">
-        {liveMode ? (
+        {snapshot && visibleItems.length === 0 && query === "" ? (
           <div className="search-empty">
             เชื่อมต่อฐานข้อมูลแล้ว — ยังไม่มีงานในคิวดำเนินการ
           </div>
         ) : visibleItems.length > 0 ? (
           visibleItems.map((item) => {
-            const Icon = item.icon;
+            const Icon = "iconName" in item ? iconMap[item.iconName] || FileClock : item.icon;
             return (
               <a className="priority-row" href="#activity" key={item.title}>
                 <span
-                  className={cn("priority-icon", toneClass[item.tone])}
+                  className={cn("priority-icon", toneClass[item.tone as Tone])}
                   aria-hidden="true"
                 >
                   <Icon />
@@ -120,24 +135,26 @@ function PriorityList({
                   <strong>{item.title}</strong>
                   <small>{item.description}</small>
                 </span>
-                <span className={cn("priority-count", toneClass[item.tone])}>
+                <span className={cn("priority-count", toneClass[item.tone as Tone])}>
                   <strong>{item.count}</strong>
                   <small>รายการ</small>
                 </span>
                 <span className="priority-status">
                   <span
-                    className={cn("status-dot", toneClass[item.tone])}
+                    className={cn("status-dot", toneClass[item.tone as Tone])}
                     aria-hidden="true"
                   />
                   {item.status}
                 </span>
-                <span className="priority-due">
-                  <CalendarDays aria-hidden="true" />
-                  <span>
-                    <small>กำหนดเสร็จ</small>
-                    <strong>{item.due}</strong>
+                {item.due && (
+                  <span className="priority-due">
+                    <CalendarDays aria-hidden="true" />
+                    <span>
+                      <small>กำหนดเสร็จ</small>
+                      <strong>{item.due}</strong>
+                    </span>
                   </span>
-                </span>
+                )}
                 <ArrowRight className="priority-arrow" aria-hidden="true" />
               </a>
             );
@@ -208,17 +225,23 @@ function ModuleOverview({
   );
 }
 
-function ActivityList({ liveMode = false }: { liveMode?: boolean }) {
+function ActivityList({ snapshot }: { snapshot?: DashboardSnapshot }) {
+  const sourceItems = snapshot?.recentActivities || recentActivities;
+  const iconMap: Record<string, LucideIcon> = { Handshake, Plane, FilePenLine, ContactRound };
+
   return (
     <section className="lower-panel" id="activity">
       <SectionHeading>กิจกรรมล่าสุด</SectionHeading>
       <div className="activity-list">
-        {liveMode ? (
+        {snapshot && sourceItems.length === 0 ? (
           <div className="search-empty">ยังไม่มีกิจกรรมในระบบ</div>
-        ) : recentActivities.map((item) => {
-          const Icon = item.icon;
+        ) : sourceItems.map((item) => {
+          const Icon = "iconName" in item ? iconMap[item.iconName] || Handshake : item.icon;
           return (
-            <div className="activity-row" key={`${item.time}-${item.title}`}>
+            <div
+              className="activity-row"
+              key={"id" in item ? item.id : `${item.time}-${item.title}`}
+            >
               <time>{item.time}</time>
               <span className="activity-icon" aria-hidden="true">
                 <Icon />
@@ -244,14 +267,16 @@ function ActivityList({ liveMode = false }: { liveMode?: boolean }) {
   );
 }
 
-function UpcomingList({ liveMode = false }: { liveMode?: boolean }) {
+function UpcomingList({ snapshot }: { snapshot?: DashboardSnapshot }) {
+  const sourceItems = snapshot?.upcomingItems || upcomingItems;
+
   return (
     <section className="lower-panel">
       <SectionHeading>กำหนดการใกล้ถึง</SectionHeading>
       <div className="upcoming-list">
-        {liveMode ? (
+        {snapshot && sourceItems.length === 0 ? (
           <div className="search-empty">ยังไม่มีกำหนดการในระบบ</div>
-        ) : upcomingItems.map((item) => (
+        ) : sourceItems.map((item) => (
           <div className="upcoming-row" key={`${item.day}-${item.title}`}>
             <time className="upcoming-date">
               <strong>{item.day}</strong>
@@ -455,11 +480,11 @@ export function DashboardWorkspace({
             ) : null}
           </div>
 
-          <PriorityList query={query} liveMode={Boolean(snapshot)} />
+          <PriorityList query={query} snapshot={snapshot} />
           <ModuleOverview access={access} snapshot={snapshot} />
           <div className="lower-grid">
-            <ActivityList liveMode={Boolean(snapshot)} />
-            <UpcomingList liveMode={Boolean(snapshot)} />
+            <ActivityList snapshot={snapshot} />
+            <UpcomingList snapshot={snapshot} />
           </div>
         </main>
       </div>

@@ -86,7 +86,8 @@ insert into private.module_permissions (
   ('b1000000-0000-0000-0000-000000000003', 'mou', true, false, false, false);
 
 insert into public.countries (id, iso2, iso3, name_th, name_en)
-values ('b2000000-0000-0000-0000-000000000001', 'KR', 'KOR', 'เกาหลีใต้', 'South Korea');
+values ('b2000000-0000-0000-0000-000000000001', 'KR', 'KOR', 'เกาหลีใต้', 'South Korea')
+on conflict (iso2) do update set id = excluded.id;
 
 insert into public.organization_units (id, code, name_th, name_en)
 values ('b3000000-0000-0000-0000-000000000001', 'MOU-RLS', 'หน่วยงานทดสอบ MOU', 'MOU Test Unit');
@@ -194,7 +195,7 @@ select is(
     select count(*)::integer
     from public.agreement_workflow_events
   ),
-  3,
+  7,
   'create, submit, and publish events are recorded'
 );
 

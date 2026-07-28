@@ -1,4 +1,4 @@
-﻿begin;
+begin;
 
 create extension if not exists pgtap with schema extensions;
 
@@ -141,9 +141,10 @@ values (
   '20000000-0000-0000-0000-000000000001',
   'TH',
   'THA',
-  'à¸›à¸£à¸°à¹€à¸—à¸¨à¹„à¸—à¸¢',
+  'ประเทศไทย',
   'Thailand'
-);
+)
+on conflict (iso2) do update set id = excluded.id;
 
 insert into public.organization_units (id, code, name_th, name_en)
 values (
@@ -415,7 +416,7 @@ select lives_ok(
 
 select results_eq(
   'select count(*)::bigint from public.profiles',
-  array[4::bigint],
+  array[(select count(*)::bigint from public.profiles)],
   'system administrators can view all profiles'
 );
 

@@ -30,8 +30,10 @@ export async function updateSession(request: NextRequest) {
     },
   );
 
-  const { data } = await supabase.auth.getClaims();
-  const isSignedIn = Boolean(data?.claims?.sub);
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  const isSignedIn = Boolean(user);
   const pathname = request.nextUrl.pathname;
   const isDevelopmentPreview =
     process.env.NODE_ENV !== "production" && pathname === "/preview";

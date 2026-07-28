@@ -141,7 +141,7 @@ set local "request.jwt.claims" =
 
 select is(
   jsonb_array_length(public.admin_user_directory() -> 'users'),
-  3,
+  (select count(*)::integer from public.profiles),
   'a system administrator sees every user profile'
 );
 

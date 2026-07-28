@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 
-export type PartnerFormState = { error?: string; id?: string; updatedAt?: string; success?: boolean };
+export type PartnerFormState = { error?: string; id?: string; updatedAt?: string; success?: boolean; message?: string };
 
 const value = (formData: FormData, name: string) => {
   const item = formData.get(name);
@@ -38,10 +38,175 @@ export async function savePartnerOrganization(
       source_note: value(formData, "source_note"),
     },
   });
+
   if (error) return { error: errorMessage(error) };
   const saved = data as { id: string; updated_at: string };
   revalidatePath("/mou");
   revalidatePath("/mou/organizations");
+  revalidatePath(`/mou/organizations/${saved.id}`);
   revalidatePath(`/mou/organizations/${saved.id}/edit`);
   return { success: true, id: saved.id, updatedAt: saved.updated_at };
+}
+
+export async function savePartnerContactAction(
+  _previous: PartnerFormState,
+  formData: FormData,
+): Promise<PartnerFormState> {
+  const contactId = value(formData, "contact_id");
+  const organizationId = value(formData, "partner_organization_id");
+  const fullName = value(formData, "full_name");
+  const positionTitle = value(formData, "position_title");
+  const department = value(formData, "department");
+  const relationshipLevel = value(formData, "relationship_level") || "unrated";
+  const email = value(formData, "email");
+  const phone = value(formData, "phone");
+  const internalNote = value(formData, "internal_note");
+
+  if (!fullName) {
+    return { error: "กรุณากรอกชื่อ-นามสกุลผู้ติดต่อ" };
+  }
+  if (!organizationId) {
+    return { error: "กรุณาระบุองค์กรคู่สัญญา" };
+  }
+
+  const supabase = await createClient();
+  const { data: userData } = await supabase.auth.getUser();
+
+  if (!userData?.user) {
+    return { error: "กรุณาเข้าสู่ระบบก่อนดำเนินการ" };
+  }
+
+  let targetContactId = contactId;
+
+  if (contactId) {
+    const { error: updateErr } = await supabase
+      .from("partner_contacts")
+      .update({
+        full_name: fullName,
+        position_title: positionTitle || null,
+        department: department || null,
+        relationship_level: relationshipLevel as "unrated" | "low" | "medium" | "high",
+        internal_note: internalNote || null,
+        updated_at: new Date().toISOString(),
+        updated_by: userData.user.id,
+      })
+      .eq("id", contactId);
+
+    if (updateErr) return { error: `ไม่สามารถอัปเดตข้อมูลผู้ติดต่อ: ${updateErr.message}` };
+  } else {
+    const { data: inserted, error: insertErr } = await supabase
+      .from("partner_contacts")
+      .insert({
+        partner_organization_id: organizationId,
+        full_name: fullName,
+        position_title: positionTitle || null,
+        department: department || null,
+        relationship_level: relationshipLevel as "unrated" | "low" | "medium" | "high",
+        internal_note: internalNote || null,
+        created_by: userData.user.id,
+      })
+      .select("id")
+      .single();
+
+    if (insertErr || !inserted) return { error: `ไม่สามารถเพิ่มผู้ติดต่อ: ${insertErr?.message}` };
+    targetContactId = inserted.id;
+  }
+
+  // Update/Insert Email Method if present
+  if (email && targetContactId) {
+    await supabase.from("partner_contact_methods").upsert(
+      {
+        partner_contact_id: targetContactId,
+        method_type: "email",
+        value: email,
+        is_primary: true,
+        created_by: userData.user.id,
+      },
+      { onConflict: "partner_contact_id, method_type, lower(value)" },
+    );
+  }
+
+  // Update/Insert Phone Method if present
+  if (phone && targetContactId) {
+    await supabase.from("partner_contact_methods").upsert(
+      {
+        partner_contact_id: targetContactId,
+        method_type: "phone",
+        value: phone,
+        is_primary: true,
+        created_by: userData.user.id,
+      },
+      { onConflict: "partner_contact_id, method_type, lower(value)" },
+    );
+  }
+
+  revalidatePath(`/mou/organizations/${organizationId}`);
+  revalidatePath("/mou/contacts");
+  return { success: true, message: "บันทึกข้อมูลผู้ติดต่อเรียบร้อยแล้ว" };
+}
+
+export async function deletePartnerContactAction(contactId: string, organizationId: string): Promise<PartnerFormState> {
+  const supabase = await createClient();
+  const { data: userData } = await supabase.auth.getUser();
+
+  if (!userData?.user) {
+    return { error: "กรุณาเข้าสู่ระบบก่อนดำเนินการ" };
+  }
+
+  const { error } = await supabase
+    .from("partner_contacts")
+    .update({
+      deleted_at: new Date().toISOString(),
+      deleted_by: userData.user.id,
+    })
+    .eq("id", contactId);
+
+  if (error) return { error: `ลบผู้ติดต่อไม่สำเร็จ: ${error.message}` };
+
+  revalidatePath(`/mou/organizations/${organizationId}`);
+  revalidatePath("/mou/contacts");
+  return { success: true, message: "ลบผู้ติดต่อเรียบร้อยแล้ว" };
+}
+
+export async function logPartnerInteractionAction(
+  _previous: PartnerFormState,
+  formData: FormData,
+): Promise<PartnerFormState> {
+  const contactId = value(formData, "partner_contact_id");
+  const organizationId = value(formData, "partner_organization_id");
+  const occurredOn = value(formData, "occurred_on") || new Date().toISOString().slice(0, 10);
+  const interactionType = value(formData, "interaction_type") || "meeting";
+  const context = value(formData, "context");
+  const note = value(formData, "note");
+
+  if (!contactId || !context) {
+    return { error: "กรุณาระบุผู้ติดต่อและรายละเอียดบริบทการประสานงาน" };
+  }
+
+  const supabase = await createClient();
+  const { data: userData } = await supabase.auth.getUser();
+
+  if (!userData?.user) {
+    return { error: "กรุณาเข้าสู่ระบบก่อนดำเนินการ" };
+  }
+
+  const { error } = await supabase.from("partner_contact_interactions").insert({
+    partner_contact_id: contactId,
+    occurred_on: occurredOn,
+    interaction_type: interactionType,
+    context: context,
+    note: note || null,
+    created_by: userData.user.id,
+  });
+
+  if (error) return { error: `ไม่สามารถบันทึกประวัติการประสานงาน: ${error.message}` };
+
+  // Update last_contacted_on for the contact
+  await supabase
+    .from("partner_contacts")
+    .update({ last_contacted_on: occurredOn })
+    .eq("id", contactId);
+
+  revalidatePath(`/mou/organizations/${organizationId}`);
+  return { success: true, message: "บันทึกประวัติการประสานงานเรียบร้อยแล้ว" };
 }

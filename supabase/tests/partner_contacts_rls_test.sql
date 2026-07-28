@@ -145,7 +145,8 @@ values (
   'VNM',
   'เวียดนาม',
   'Vietnam'
-);
+)
+on conflict (iso2) do update set id = excluded.id;
 
 insert into public.partner_organizations (
   id,

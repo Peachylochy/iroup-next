@@ -36,7 +36,7 @@ export const navigationGroups = [
       },
       {
         label: "ผู้ติดต่อองค์กรต่างประเทศ",
-        href: "#module-overview",
+        href: "/mou/contacts",
         icon: ContactRound,
         module: "mou",
         internal: true,
@@ -45,25 +45,25 @@ export const navigationGroups = [
   },
   {
     label: "การเดินทางและ Mobility",
-    href: "#priority-work",
+    href: "/mobility",
     icon: Plane,
     module: "mobility",
     children: [
       {
         label: "Mobility นิสิต",
-        href: "#module-overview",
+        href: "/mobility?category=student_exchange",
         icon: GraduationCap,
         module: "mobility",
       },
       {
         label: "Mobility บุคลากร",
-        href: "#module-overview",
+        href: "/mobility?category=staff_exchange",
         icon: UsersRound,
         module: "mobility",
       },
       {
         label: "เดินทางไปปฏิบัติงาน",
-        href: "#module-overview",
+        href: "/mobility?category=staff_official_travel",
         icon: BriefcaseBusiness,
         module: "travel",
       },

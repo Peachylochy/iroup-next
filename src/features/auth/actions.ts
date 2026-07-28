@@ -44,6 +44,24 @@ export async function signInAction(
   redirect("/");
 }
 
+export async function demoSignInAction(): Promise<AuthActionState> {
+  if (process.env.NODE_ENV === "production") {
+    return { message: "Demo login is disabled in production." };
+  }
+
+  const supabase = await createClient();
+  const { error } = await supabase.auth.signInWithPassword({
+    email: "thratip.so@up.ac.th",
+    password: "password123",
+  });
+
+  if (error) {
+    return { message: `เกิดข้อผิดพลาดในการเข้าสู่ระบบ Demo: ${error.message}` };
+  }
+
+  redirect("/");
+}
+
 export async function signUpAction(
   _previousState: AuthActionState,
   formData: FormData,

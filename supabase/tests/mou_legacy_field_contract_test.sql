@@ -46,13 +46,14 @@ insert into private.module_permissions (
 );
 
 insert into public.countries (id, iso2, iso3, name_th, name_en, continent_code)
-values ('c2000000-0000-0000-0000-000000000001', 'JP', 'JPN', 'ญี่ปุ่น', 'Japan', 'AS');
+values ('c2000000-0000-0000-0000-000000000001', 'JP', 'JPN', 'ญี่ปุ่น', 'Japan', 'AS')
+on conflict (iso2) do update set name_th = excluded.name_th;
 
 insert into public.partner_organizations (id, name_th, name_en, country_id, verification_status)
 values (
   'c3000000-0000-0000-0000-000000000001',
   'มหาวิทยาลัยทดสอบ', 'Test University',
-  'c2000000-0000-0000-0000-000000000001', 'verified'
+  '21000000-0000-0000-0000-000000000001', 'verified'
 );
 
 insert into public.agreements (
