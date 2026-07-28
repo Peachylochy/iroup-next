@@ -10,7 +10,6 @@ import {
   Filter,
   Handshake,
   Plus,
-  Search,
 } from "lucide-react";
 
 import { WorkspaceChrome } from "@/components/app-shell/workspace-chrome";
@@ -153,7 +152,7 @@ export function MouWorkspace({ access, agreements, viewer, initialFilters }: Pro
   const exportXlsx = () => startExport(() => { void downloadMouXlsx(filteredAgreements); });
 
   return (
-    <WorkspaceChrome access={access} viewer={viewer} title="ความร่วมมือและ MOU" activePath="/mou" query={query} onQueryChange={setQuery}>
+    <WorkspaceChrome access={access} viewer={viewer} title="ความร่วมมือและ MOU" activePath="/mou" query={query} onQueryChange={setQuery} searchPlaceholder="ค้นหาชื่อ MOU องค์กร หน่วยงาน หรือประเทศ">
       <main className="module-main">
         <div className="module-page-heading">
           <div>
@@ -173,7 +172,6 @@ export function MouWorkspace({ access, agreements, viewer, initialFilters }: Pro
         <section className="module-list-card" aria-labelledby="mou-list-title">
           <div className="module-list-toolbar">
             <div><h2 id="mou-list-title">รายการ MOU</h2><p>ข้อมูลจาก Supabase · แสดงเฉพาะรายการที่ยังไม่ถูกลบ</p></div>
-            <label className="module-search"><Search aria-hidden="true" /><span className="sr-only">ค้นหารายการ MOU</span><Input type="search" placeholder="ค้นหาชื่อ MOU องค์กร หน่วยงาน หรือประเทศ" value={query} onChange={(event) => setQuery(event.target.value)} /></label>
           </div>
 
           <div className="module-filter-row" role="group" aria-label="กรองสถานะ MOU">
