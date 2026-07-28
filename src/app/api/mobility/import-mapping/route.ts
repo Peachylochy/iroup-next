@@ -53,6 +53,14 @@ export async function POST(request: Request) {
     .insert({ code: payload.code || null, name_th: payload.nameTh, name_en: payload.nameEn || null, unit_type: "import_pending" })
     .select("id, code, name_th, name_en")
     .single();
-  if (error) return NextResponse.json({ error: error.code === "23505" ? "พบรหัสหน่วยงานนี้แล้ว กรุณาเลือกรายการเดิม" : "สร้างหน่วยงานไม่สำเร็จ" }, { status: 400 });
+  if (error) {
+    console.error("Unable to create organization unit from mobility import mapping", error);
+    const message = error.code === "23505"
+      ? "พบรหัสหน่วยงานนี้แล้ว กรุณาเลือกรายการเดิม"
+      : error.code === "42501"
+        ? "บัญชีนี้ไม่มีสิทธิ์เพิ่มหน่วยงาน ม.พะเยา"
+        : "สร้างหน่วยงานไม่สำเร็จ กรุณาลองใหม่หรือติดต่อผู้ดูแลระบบ";
+    return NextResponse.json({ error: message }, { status: 400 });
+  }
   return NextResponse.json({ id: data.id, code: data.code, nameTh: data.name_th, nameEn: data.name_en });
 }

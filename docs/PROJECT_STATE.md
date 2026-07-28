@@ -60,6 +60,8 @@ iROUP Next เป็นระบบใหม่ที่พัฒนาด้ว
 - Mobility Stage 1 migration `20260728150616_student_mobility_stage_1` ทดสอบบน Local Supabase แล้ว:
   เพิ่มเวลาไป-กลับ, snapshot ของคู่ความร่วมมือ/ประเทศ, snapshot ของนิสิต, workflow events และ guarded RPC
   สำหรับ draft, participant, funding, review, approve, activate และ complete โดยปิด direct write เฉพาะ `student_mobility`
+- Migration `20260728164614_grant_authenticated_organization_unit_write` แก้สิทธิ์ระดับตารางที่เคยขาด:
+  System Admin เพิ่มหน่วยงาน ม.พะเยาจากหน้า Mobility import ได้ โดย RLS เดิมยังเป็นผู้จำกัดสิทธิ์; pgTAP ผ่าน 2/2 และ Browser QA สร้าง/เลือกหน่วยงาน `SAFA` สำเร็จ
 - `supabase/tests/student_mobility_stage_1_test.sql` ผ่าน 11/11: anon ถูกปิด, Editor ทำ draft/participant/submit ได้,
   Publisher อนุมัติได้ และผู้มีสิทธิ์ `travel` อย่างเดียวเข้าถึง Mobility ไม่ได้
 - Local Security Advisor (warn/error) ไม่พบ issue หลัง migration Mobility
@@ -107,7 +109,7 @@ iROUP Next เป็นระบบใหม่ที่พัฒนาด้ว
 
 ## จุดเริ่มงานครั้งถัดไป
 
-1. ตรวจ Mapping ของ Mobility นิสิตจาก `IROUP_DATABASE_PRODUCTION.xlsx`: หน้าตรวจนำเข้ากรองสีส้ม/แดงได้, เลือกประเทศ/องค์กร/หน่วยงานอ้างอิงได้ และสร้างองค์กรแบบ `pending_verification` หรือหน่วยงานโดย System Admin ได้; การเลือก mapping ยังอยู่ใน browser และยังไม่มี staging batch หรือ commit ข้อมูลจริง
+1. ตรวจ Mapping ของ Mobility นิสิตจาก `IROUP_DATABASE_PRODUCTION.xlsx`: หน้าตรวจนำเข้ากรองสีส้ม/แดงได้, เลือกประเทศ/องค์กร/หน่วยงานอ้างอิงได้, เลือก “ยังระบุองค์กรไม่ได้” พร้อมหมายเหตุติดตามได้ และสร้างองค์กรแบบ `pending_verification` หรือหน่วยงานโดย System Admin ได้; การเลือก mapping ยังอยู่ใน browser และยังไม่มี staging batch หรือ commit ข้อมูลจริง
 2. เมื่อเจ้าหน้าที่ตรวจและเลือก mapping ครบ ให้สร้าง staging batch/review ที่บันทึกเฉพาะรายการและ mapping ที่ผ่านการตรวจ แล้วค่อยขออนุมัติ commit แยกต่างหาก
 3. ทำ internal attachment workflow หลังยืนยัน storage integration; ยังไม่เชื่อม SharePoint อัตโนมัติจนกว่า CITCOMS อนุมัติ Graph API
 4. `staff_mobility` และ `staff_official_travel` ค่อยต่อยอดตาม category contract
