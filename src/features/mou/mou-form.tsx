@@ -147,7 +147,7 @@ export function MouForm({ access, agreement, options, preselectedPartnerId }: Pr
 
   useEffect(() => {
     if (state.id && !agreement) {
-      router.replace(`/mou/${state.id}/edit`);
+      router.replace(`/mou/${state.id}?created=1#attachments`);
       return;
     }
     if (state.success) router.refresh();

@@ -88,14 +88,14 @@ iROUP Next เป็นระบบใหม่ที่พัฒนาด้ว
 
 - Repository: `Peachylochy/iroup-next`
 - Main includes PR #1 `1dcfb4a` and PR #2 `1743eb5`
-- Current branch: `main`
-- Current work: MOU form foundation ตาม legacy matrix เสร็จ; งานถัดไปคือ MOU detail/attachments
+- Current branch: `agent/mou-attachment-flow` (pending PR)
+- Current work: MOU detail and internal attachment management only; Mobility remains out of scope until its legacy matrix is approved.
 
 ## จุดเริ่มงานครั้งถัดไป
 
-1. เพิ่ม MOU detail และ attachment management แบบข้อมูลภายใน
-2. ทำ list/filter/export ให้ครบก่อน map/analytics
-3. ทำ matrix ของ Mobility ก่อนเริ่มพัฒนา Mobility module
+1. Review and merge the focused MOU detail/attachment PR; apply its migration to production only after approval.
+2. Complete MOU list/filter/export before map/analytics.
+3. Create the Mobility preserve/improve/retire matrix before implementing Mobility.
 
 ## ข้อควรจำ
 

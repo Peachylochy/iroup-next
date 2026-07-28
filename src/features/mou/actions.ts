@@ -129,3 +129,134 @@ export async function submitMouForm(
   revalidatePath(`/mou/${saved.id}/edit`);
   return { success: "draft", id: saved.id, updatedAt: saved.updated_at };
 }
+
+export async function returnMouToDraftAction(
+  agreementId: string,
+  expectedUpdatedAt: string,
+  note?: string,
+): Promise<MouFormState> {
+  const supabase = await createClient();
+  const { data, error } = await supabase.rpc("mou_return_to_draft", {
+    target_agreement_id: agreementId,
+    expected_updated_at: expectedUpdatedAt,
+    note: note ?? null,
+  });
+
+  if (error) return { error: mouErrorMessage(error) };
+  const result = data as { id: string; updated_at: string };
+  revalidatePath("/mou");
+  revalidatePath(`/mou/${agreementId}`);
+  revalidatePath(`/mou/${agreementId}/edit`);
+  return { success: "draft", id: result.id, updatedAt: result.updated_at };
+}
+
+export async function softDeleteMouAction(
+  agreementId: string,
+  expectedUpdatedAt: string,
+  note?: string,
+): Promise<MouFormState> {
+  const supabase = await createClient();
+  const { data, error } = await supabase.rpc("mou_soft_delete", {
+    target_agreement_id: agreementId,
+    expected_updated_at: expectedUpdatedAt,
+    delete_note: note ?? null,
+  });
+
+  if (error) return { error: mouErrorMessage(error) };
+  const result = data as { id: string; updated_at: string };
+  revalidatePath("/mou");
+  revalidatePath(`/mou/${agreementId}`);
+  return { success: "draft", id: result.id, updatedAt: result.updated_at };
+}
+
+export async function restoreMouAction(
+  agreementId: string,
+  expectedUpdatedAt: string,
+): Promise<MouFormState> {
+  const supabase = await createClient();
+  const { data, error } = await supabase.rpc("mou_restore", {
+    target_agreement_id: agreementId,
+    expected_updated_at: expectedUpdatedAt,
+  });
+
+  if (error) return { error: mouErrorMessage(error) };
+  const result = data as { id: string; updated_at: string };
+  revalidatePath("/mou");
+  revalidatePath(`/mou/${agreementId}`);
+  return { success: "draft", id: result.id, updatedAt: result.updated_at };
+}
+
+export async function attachMouFileAction(
+  agreementId: string,
+  storagePath: string,
+  filename: string,
+  mimeType?: string,
+  sizeBytes?: number,
+) {
+  const supabase = await createClient();
+  const { data, error } = await supabase.rpc("mou_attach_file", {
+    p_agreement_id: agreementId,
+    p_storage_path: storagePath,
+    p_original_file_name: filename,
+    p_mime_type: mimeType ?? null,
+    p_size_bytes: sizeBytes ?? null,
+  });
+
+  if (error) {
+    return { error: mouErrorMessage(error) };
+  }
+
+  revalidatePath(`/mou/${agreementId}`);
+  return { success: true, data };
+}
+
+export async function detachMouFileAction(agreementId: string, assetId: string) {
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("mou_detach_file", {
+    p_agreement_id: agreementId,
+    p_asset_id: assetId,
+  });
+
+  if (error) {
+    return { error: mouErrorMessage(error) };
+  }
+
+  revalidatePath(`/mou/${agreementId}`);
+  return { success: true };
+}
+
+export async function getMouAttachmentSignedUrlAction(
+  agreementId: string,
+  assetId: string,
+  expiresInSeconds = 3600,
+): Promise<string | null> {
+  const supabase = await createClient();
+  const { data: recordAsset, error: recordAssetError } = await supabase
+    .from("record_assets")
+    .select("assets!inner(storage_bucket, storage_path)")
+    .eq("agreement_id", agreementId)
+    .eq("asset_id", assetId)
+    .maybeSingle();
+
+  if (recordAssetError || !recordAsset) {
+    return null;
+  }
+
+  const asset = Array.isArray(recordAsset.assets)
+    ? recordAsset.assets[0]
+    : recordAsset.assets;
+
+  if (!asset || asset.storage_bucket !== "mou-attachments") {
+    return null;
+  }
+
+  const { data, error } = await supabase.storage
+    .from("mou-attachments")
+    .createSignedUrl(asset.storage_path, expiresInSeconds);
+
+  if (error) {
+    console.error("Error creating signed URL for MOU attachment:", error);
+    return null;
+  }
+  return data?.signedUrl ?? null;
+}

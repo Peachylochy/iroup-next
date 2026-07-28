@@ -57,8 +57,8 @@ function formatDate(value: string | null) {
 function partnerName(agreement: MouAgreement) {
   const partner =
     agreement.agreement_partners.find((item) => item.is_lead)
-      ?.partner_organizations[0] ??
-    agreement.agreement_partners[0]?.partner_organizations[0];
+      ?.partner_organizations ??
+    agreement.agreement_partners[0]?.partner_organizations;
   return partner?.name_th || partner?.name_en || "ยังไม่ระบุองค์กรคู่ความร่วมมือ";
 }
 
