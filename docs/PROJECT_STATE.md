@@ -55,6 +55,8 @@ iROUP Next เป็นระบบใหม่ที่พัฒนาด้ว
   - `20260727034322_mou_write_workflow`
   - `20260727045323_partner_organization_workflow`
   - `20260727075135_mou_legacy_field_contract`
+  - `20260727084026_remove_mou_file_retention`
+  - `20260728000000_mou_attachments_and_storage`
 - ทดสอบสิทธิ์ MOU บน remote database ด้วย transaction rollback ผ่าน: direct write
   ถูกปิด, Editor สร้าง/ส่งตรวจได้แต่เผยแพร่ไม่ได้, Publisher เผยแพร่ได้ และ Viewer ถูกปฏิเสธ
 - เพิ่มและรัน pgTAP test ที่ `supabase/tests/mou_write_workflow_test.sql` บน local
@@ -87,14 +89,16 @@ iROUP Next เป็นระบบใหม่ที่พัฒนาด้ว
 ## GitHub
 
 - Repository: `Peachylochy/iroup-next`
-- Main includes PR #1 `1dcfb4a` and PR #2 `1743eb5`
-- Current branch: `agent/mou-attachment-flow` (pending PR)
-- Current work: MOU detail and internal attachment management only; Mobility remains out of scope until its legacy matrix is approved.
+- Main includes PR #1 `1dcfb4a`, PR #2 `1743eb5`, and PR #4 `d06610c` (MOU detail + internal attachments).
+- PR #5 (`agent/fix-search-spacing`) remains a separate small UI-fix PR and has not been merged yet.
+- Current branch: `agent/mou-list-filter-export` (pending PR).
+- Current work: MOU list filtering, pagination, and CSV/XLSX export. Mobility remains out of scope until its legacy matrix is approved.
+- Local sample MOU/partner/master records were intentionally removed on 28 July 2569; the linked production project is also empty of sample records.
 
 ## จุดเริ่มงานครั้งถัดไป
 
-1. Review and merge the focused MOU detail/attachment PR; apply its migration to production only after approval.
-2. Complete MOU list/filter/export before map/analytics.
+1. Review and merge the focused MOU list/filter/export PR; keep PR #5 separate or merge it first as a small UI fix.
+2. Build MOU map + owner-unit analytics after list/filter/export is complete.
 3. Create the Mobility preserve/improve/retire matrix before implementing Mobility.
 
 ## ข้อควรจำ
