@@ -1620,6 +1620,46 @@
     line-height: 1.55;
   }
 
+  .mobility-import-file-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .mobility-import-file-picker {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 38px;
+    padding: 0 14px;
+    border-radius: 8px;
+    background: var(--primary);
+    color: var(--primary-foreground);
+    font-size: 13px;
+    font-weight: 650;
+    cursor: pointer;
+    transition: background-color 160ms ease, transform 160ms ease;
+  }
+
+  .mobility-import-file-picker:hover { background: color-mix(in oklch, var(--primary), black 12%); }
+  .mobility-import-file-picker:active { transform: translateY(1px); }
+  .mobility-import-file-picker:focus-within { outline: 3px solid color-mix(in oklch, var(--ring), transparent 65%); outline-offset: 2px; }
+  .mobility-import-file-picker svg { width: 16px; height: 16px; }
+  .mobility-import-file-picker input { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; }
+
+  .mobility-import-file-name {
+    min-width: 220px;
+    max-width: 420px;
+    overflow: hidden;
+    color: var(--muted-foreground);
+    font-size: 13px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .mobility-import-file-name.is-selected { color: var(--foreground); font-weight: 550; }
+
   .mobility-import-fields {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -1908,6 +1948,9 @@
   .mobility-import-follow-up,
   .mobility-import-fields { margin-left: 0; }
   .mobility-import-fields { grid-template-columns: 1fr; padding: 12px; }
+  .mobility-import-file-actions { align-items: stretch; }
+  .mobility-import-file-picker { justify-content: center; }
+  .mobility-import-file-name { min-width: 0; max-width: none; width: 100%; }
   .mobility-import-control { flex-direction: column; }
   .mobility-import-control > button { align-self: flex-start; }
   .mobility-import-create-form { grid-template-columns: 1fr; }
