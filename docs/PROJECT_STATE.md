@@ -1,7 +1,24 @@
 # iROUP Next: Project State
 
-อัปเดตล่าสุด: 28 กรกฎาคม 2569
-สถานะ: MOU core, detail, private attachment, list/filter/export และ analytics ปิดรอบแล้ว; Mobility นิสิต Stage 1 ปิด migration/RLS/RPC/pgTAP และ List/Detail/Form UI แล้ว รอ review/merge
+## Update — 29 July 2026: Master Import staging is real
+
+- `agent/student-mobility-import-preview` contains commit `5a51715` and is pushed to GitHub. It adds `/settings/master-import`, `docs/MASTER_IMPORT_FIELD_MAPPING.md`, and migration `20260728173727_master_import_staging`.
+- The page is System Admin-only. It parses five legacy sheets: `COUNTRY_MASTER`, `UP_UNIT_MASTER`, `PARTNER_ORG_MASTER`, `PERSON_STUDENT`, and `PERSON_STAFF`.
+- Browser QA used the real `IROUP_DATABASE_PRODUCTION.xlsx`. The confirmed local staging batch is `3f87cf08-90b3-49bc-936d-42c5f9089527`, status `ready`, with 26,999 staged rows: 26,965 valid, 33 warnings, and 1 invalid row.
+- The failed first browser attempt exposed duplicate source row numbers across sheets. The batch was deleted, the staging sequence was fixed to use batch-wide row numbers, and the retry succeeded.
+- Master tables are still unchanged after the staging test: 14 countries, 19 organization units, 49 partner organizations, and 0 people. A staging batch is **not** a master-data commit.
+- RLS protects `master_data` batches/rows for System Admin only. pgTAP `master_import_staging_test.sql` passes 5/5 and `pnpm typecheck` passes.
+
+### Next decision gates
+
+1. Build the staging review/detail screen: inspect the 33 update warnings and repair/skip the one invalid staff row.
+2. Implement an explicit, separately authorized master commit workflow in dependency order: countries → units → partner organizations / people. It must support rollback-safe failure handling and must not be triggered by preview.
+3. Only after the master commit is approved, re-run the Mobility project import mapping against the populated masters, then stage Mobility projects and participants separately.
+
+> Do not treat the current staging batch as approved for commit. No Mobility project/participant rows and no master rows have been written from this workbook yet.
+
+อัปเดตล่าสุด: 29 กรกฎาคม 2569
+สถานะ: MOU core ปิดรอบแล้ว; Mobility นิสิต Stage 1 พร้อมใช้งานใน local และ Master Import ได้สร้าง staging batch จริงแล้ว — รอหน้าตรวจทาน/อนุมัติ commit master ก่อนนำข้อมูล Mobility เข้า
 
 > ก่อนสร้างโมดูลใหม่หรือขยาย MOU ให้ใช้ `docs/LEGACY_FUNCTION_INVENTORY.md`
 > เป็น baseline และทำ preserve/improve/retire matrix ของโมดูลนั้นก่อนเสมอ
