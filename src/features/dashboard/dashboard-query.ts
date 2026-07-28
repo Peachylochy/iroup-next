@@ -1,11 +1,13 @@
 import type { CurrentUserAccess, ModuleKey } from "@/lib/auth/access";
 import { createClient } from "@/lib/supabase/server";
+import { buildMouAnalytics, type MouAnalytics, type MouAnalyticsSource } from "./mou-analytics";
 
 export type DashboardSnapshot = {
   agreements: number;
   mobility: number;
   officialTravel: number;
   partnerContacts: number;
+  mouAnalytics: MouAnalytics | null;
   connected: true;
 };
 
@@ -18,9 +20,21 @@ export async function getDashboardSnapshot(
 ): Promise<DashboardSnapshot> {
   const supabase = await createClient();
 
-  const agreementsPromise = canView(access, "mou")
-    ? supabase.from("agreements").select("*", { count: "exact", head: true })
-    : Promise.resolve({ count: 0, error: null });
+  const mouAnalyticsPromise = canView(access, "mou")
+    ? supabase
+        .from("agreements")
+        .select(`
+          id, title_th, title_en, status, workflow_status, end_date,
+          agreement_partners (
+            is_lead, partner_name_th_snapshot, partner_name_en_snapshot,
+            country_name_th_snapshot, country_name_en_snapshot
+          ),
+          agreement_units (
+            is_owner, organization_units (name_th, name_en)
+          )
+        `)
+        .is("deleted_at", null)
+    : Promise.resolve({ data: [], error: null });
   const mobilityPromise = canView(access, "mobility")
     ? supabase
         .from("movement_cases")
@@ -43,15 +57,15 @@ export async function getDashboardSnapshot(
         .select("*", { count: "exact", head: true })
     : Promise.resolve({ count: 0, error: null });
 
-  const [agreements, mobility, travel, contacts] = await Promise.all([
-    agreementsPromise,
+  const [mouAnalyticsResult, mobility, travel, contacts] = await Promise.all([
+    mouAnalyticsPromise,
     mobilityPromise,
     travelPromise,
     contactsPromise,
   ]);
 
   const firstError = [
-    agreements.error,
+    mouAnalyticsResult.error,
     mobility.error,
     travel.error,
     contacts.error,
@@ -61,11 +75,16 @@ export async function getDashboardSnapshot(
     throw new Error(`Unable to read dashboard summary: ${firstError.message}`);
   }
 
+  const mouAnalytics = canView(access, "mou")
+    ? buildMouAnalytics((mouAnalyticsResult.data ?? []) as unknown as MouAnalyticsSource[])
+    : null;
+
   return {
-    agreements: agreements.count ?? 0,
+    agreements: mouAnalytics?.total ?? 0,
     mobility: mobility.count ?? 0,
     officialTravel: travel.count ?? 0,
     partnerContacts: contacts.count ?? 0,
+    mouAnalytics,
     connected: true,
   };
 }

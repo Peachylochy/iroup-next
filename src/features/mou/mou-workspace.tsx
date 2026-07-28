@@ -27,6 +27,15 @@ type Props = {
   access: CurrentUserAccess;
   agreements: MouAgreement[];
   viewer: { displayName: string; email: string; role: string };
+  initialFilters?: MouInitialFilters;
+};
+
+export type MouInitialFilters = {
+  status?: string;
+  workflow?: string;
+  country?: string;
+  owner?: string;
+  renewalBefore?: string;
 };
 
 const PAGE_SIZE = 10;
@@ -87,15 +96,18 @@ function ownerUnitName(agreement: MouAgreement) {
   return unit?.name_th || unit?.name_en || "";
 }
 
-export function MouWorkspace({ access, agreements, viewer }: Props) {
+export function MouWorkspace({ access, agreements, viewer, initialFilters }: Props) {
   const [query, setQuery] = useState("");
-  const [status, setStatus] = useState<(typeof statusOptions)[number][0]>("all");
-  const [workflow, setWorkflow] = useState<(typeof workflowOptions)[number][0]>("all");
+  const initialStatus = statusOptions.some(([value]) => value === initialFilters?.status) ? initialFilters?.status as (typeof statusOptions)[number][0] : "all";
+  const initialWorkflow = workflowOptions.some(([value]) => value === initialFilters?.workflow) ? initialFilters?.workflow as (typeof workflowOptions)[number][0] : "all";
+  const [status, setStatus] = useState<(typeof statusOptions)[number][0]>(initialStatus);
+  const [workflow, setWorkflow] = useState<(typeof workflowOptions)[number][0]>(initialWorkflow);
   const [type, setType] = useState("all");
-  const [country, setCountry] = useState("all");
-  const [ownerUnit, setOwnerUnit] = useState("all");
+  const [country, setCountry] = useState(initialFilters?.country ?? "all");
+  const [ownerUnit, setOwnerUnit] = useState(initialFilters?.owner ?? "all");
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
+  const [renewalBefore, setRenewalBefore] = useState(initialFilters?.renewalBefore ?? "");
   const [sort, setSort] = useState("updated_desc");
   const [page, setPage] = useState(1);
   const [isExporting, startExport] = useTransition();
@@ -114,7 +126,8 @@ export function MouWorkspace({ access, agreements, viewer }: Props) {
         partnerName(agreement), countryName(agreement), continentCode(agreement), ownerUnitName(agreement),
       ].filter(Boolean).join(" ").toLocaleLowerCase("th").includes(normalized);
       const matchesDate = (!fromDate || (agreement.start_date && agreement.start_date >= fromDate)) && (!toDate || (agreement.start_date && agreement.start_date <= toDate));
-      return matchesSearch && matchesDate &&
+      const matchesRenewal = !renewalBefore || (agreement.status === "active" && agreement.end_date && agreement.end_date >= new Date().toISOString().slice(0, 10) && agreement.end_date <= renewalBefore);
+      return matchesSearch && matchesDate && matchesRenewal &&
         (status === "all" || agreement.status === status) &&
         (workflow === "all" || agreement.workflow_status === workflow) &&
         (type === "all" || agreement.agreement_type === type) &&
@@ -127,7 +140,7 @@ export function MouWorkspace({ access, agreements, viewer }: Props) {
       if (sort === "start_desc") return (right.start_date ?? "").localeCompare(left.start_date ?? "");
       return right.updated_at.localeCompare(left.updated_at);
     });
-  }, [agreements, country, fromDate, ownerUnit, query, sort, status, toDate, type, workflow]);
+  }, [agreements, country, fromDate, ownerUnit, query, renewalBefore, sort, status, toDate, type, workflow]);
 
   const totalPages = Math.max(1, Math.ceil(filteredAgreements.length / PAGE_SIZE));
   const currentPage = Math.min(page, totalPages);
@@ -136,7 +149,7 @@ export function MouWorkspace({ access, agreements, viewer }: Props) {
   const canCreate = Boolean(access.modules.mou?.create);
   const canUpdate = Boolean(access.modules.mou?.update);
   const canExport = Boolean(access.modules.mou?.view);
-  const clearFilters = () => { setQuery(""); setStatus("all"); setWorkflow("all"); setType("all"); setCountry("all"); setOwnerUnit("all"); setFromDate(""); setToDate(""); setSort("updated_desc"); };
+  const clearFilters = () => { setQuery(""); setStatus("all"); setWorkflow("all"); setType("all"); setCountry("all"); setOwnerUnit("all"); setFromDate(""); setToDate(""); setRenewalBefore(""); setSort("updated_desc"); };
   const exportXlsx = () => startExport(() => { void downloadMouXlsx(filteredAgreements); });
 
   return (
@@ -175,6 +188,7 @@ export function MouWorkspace({ access, agreements, viewer }: Props) {
             <label>หน่วยงานเจ้าของ<select value={ownerUnit} onChange={(event) => setOwnerUnit(event.target.value)}><option value="all">ทุกหน่วยงาน</option>{filterOptions.ownerUnits.map((value) => <option key={value} value={value}>{value}</option>)}</select></label>
             <label>เริ่มตั้งแต่<Input type="date" value={fromDate} onChange={(event) => setFromDate(event.target.value)} /></label>
             <label>ถึงวันที่<Input type="date" value={toDate} onChange={(event) => setToDate(event.target.value)} /></label>
+            <label>สิ้นสุดภายใน<Input type="date" value={renewalBefore} onChange={(event) => setRenewalBefore(event.target.value)} /></label>
             <label>เรียงลำดับ<select value={sort} onChange={(event) => setSort(event.target.value)}><option value="updated_desc">แก้ไขล่าสุด</option><option value="start_desc">วันเริ่มใหม่สุด</option><option value="start_asc">วันเริ่มเก่าสุด</option><option value="title_asc">ชื่อ ก-ฮ / A-Z</option></select></label>
             <Button type="button" variant="ghost" size="sm" onClick={clearFilters}>ล้างตัวกรอง</Button>
           </div>

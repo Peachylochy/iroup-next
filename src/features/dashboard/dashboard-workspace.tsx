@@ -1,11 +1,14 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Link from "next/link";
 import {
   ArrowRight,
   Bell,
   CalendarDays,
   ChevronDown,
+  FileClock,
+  FilePenLine,
   LockKeyhole,
   LogOut,
   Menu,
@@ -32,6 +35,7 @@ import {
   upcomingItems,
 } from "./dashboard-data";
 import type { DashboardSnapshot } from "./dashboard-query";
+import type { MouAnalytics } from "./mou-analytics";
 
 type Tone = "critical" | "warning" | "attention";
 
@@ -82,10 +86,10 @@ function SectionHeading({
 
 function PriorityList({
   query,
-  liveMode = false,
+  mouAnalytics,
 }: {
   query: string;
-  liveMode?: boolean;
+  mouAnalytics: MouAnalytics | null | undefined;
 }) {
   const visibleItems = useMemo(() => {
     const normalized = query.trim().toLocaleLowerCase("th");
@@ -101,10 +105,33 @@ function PriorityList({
     <section className="priority-section" aria-labelledby="priority-work">
       <SectionHeading id="priority-work">งานที่ต้องดำเนินการ</SectionHeading>
       <div className="priority-list">
-        {liveMode ? (
-          <div className="search-empty">
-            เชื่อมต่อฐานข้อมูลแล้ว — ยังไม่มีงานในคิวดำเนินการ
-          </div>
+        {mouAnalytics ? (
+          mouAnalytics.expiring > 0 || mouAnalytics.underReview > 0 ? (
+            <>
+              {mouAnalytics.expiring > 0 ? (
+                <Link className="priority-row" href="/mou?renewal=90">
+                  <span className={cn("priority-icon", toneClass.critical)} aria-hidden="true"><FileClock /></span>
+                  <span className="priority-copy"><strong>MOU ใกล้หมดอายุ</strong><small>มีวันสิ้นสุดภายใน 90 วัน</small></span>
+                  <span className={cn("priority-count", toneClass.critical)}><strong>{mouAnalytics.expiring}</strong><small>รายการ</small></span>
+                  <span className="priority-status"><span className={cn("status-dot", toneClass.critical)} aria-hidden="true" />เร่งติดตาม</span>
+                  <span className="priority-due"><CalendarDays aria-hidden="true" /><span><small>ช่วงติดตาม</small><strong>ภายใน 90 วัน</strong></span></span>
+                  <ArrowRight className="priority-arrow" aria-hidden="true" />
+                </Link>
+              ) : null}
+              {mouAnalytics.underReview > 0 ? (
+                <Link className="priority-row" href="/mou?workflow=under_review">
+                  <span className={cn("priority-icon", toneClass.warning)} aria-hidden="true"><FilePenLine /></span>
+                  <span className="priority-copy"><strong>แบบร่าง MOU รอตรวจสอบ</strong><small>รายการที่ส่งเข้าสู่ขั้นตอนตรวจสอบแล้ว</small></span>
+                  <span className={cn("priority-count", toneClass.warning)}><strong>{mouAnalytics.underReview}</strong><small>รายการ</small></span>
+                  <span className="priority-status"><span className={cn("status-dot", toneClass.warning)} aria-hidden="true" />รอดำเนินการ</span>
+                  <span className="priority-due"><CalendarDays aria-hidden="true" /><span><small>รายการ</small><strong>ตรวจสอบข้อมูล</strong></span></span>
+                  <ArrowRight className="priority-arrow" aria-hidden="true" />
+                </Link>
+              ) : null}
+            </>
+          ) : (
+            <div className="search-empty">ยังไม่มี MOU ที่ต้องติดตามต่ออายุหรือรอตรวจสอบ</div>
+          )
         ) : visibleItems.length > 0 ? (
           visibleItems.map((item) => {
             const Icon = item.icon;
@@ -176,6 +203,13 @@ function ModuleOverview({
           if (access && !access.modules[item.module]?.view) return null;
           const Icon = item.icon;
           const value = liveValues?.[index] ?? item.value;
+          const detail = index === 0 && snapshot?.mouAnalytics
+            ? `ใช้งานอยู่ ${snapshot.mouAnalytics.active} · ใกล้หมดอายุ ${snapshot.mouAnalytics.expiring}`
+            : snapshot
+              ? value === 0
+                ? "ยังไม่มีข้อมูลในฐานข้อมูล"
+                : "ข้อมูลจาก Supabase"
+              : item.detail;
           return (
             <article className="module-summary" key={item.label}>
               <span className="module-icon" aria-hidden="true">
@@ -192,13 +226,7 @@ function ModuleOverview({
                   <strong>{value}</strong>
                   <span>{item.unit}</span>
                 </p>
-                <small>
-                  {snapshot
-                    ? value === 0
-                      ? "ยังไม่มีข้อมูลในฐานข้อมูล"
-                      : "ข้อมูลจาก Supabase"
-                    : item.detail}
-                </small>
+                <small>{detail}</small>
               </div>
             </article>
           );
@@ -206,6 +234,46 @@ function ModuleOverview({
       </div>
     </section>
   );
+}
+
+function MouAnalyticsOverview({ analytics }: { analytics: MouAnalytics | null | undefined }) {
+  if (!analytics) return null;
+
+  const maxOwnerCount = Math.max(...analytics.ownerUnits.map((item) => item.count), 1);
+  const maxCountryCount = Math.max(...analytics.countries.map((item) => item.count), 1);
+
+  return (
+    <section className="mou-analytics-section" aria-labelledby="mou-analytics-title">
+      <div className="mou-analytics-heading">
+        <SectionHeading id="mou-analytics-title">ภาพรวม MOU และงานต่ออายุ</SectionHeading>
+        <Link href="/mou">ดูรายการ MOU <ArrowRight aria-hidden="true" /></Link>
+      </div>
+      <div className="mou-kpi-grid">
+        <Link href="/mou?status=active"><small>ใช้งานอยู่</small><strong>{analytics.active}</strong><span>ฉบับ</span></Link>
+        <Link href="/mou?renewal=90"><small>ใกล้หมดอายุ</small><strong>{analytics.expiring}</strong><span>ภายใน 90 วัน</span></Link>
+        <Link href="/mou?status=expired"><small>หมดอายุ</small><strong>{analytics.expired}</strong><span>ฉบับ</span></Link>
+        <Link href="/mou?workflow=under_review"><small>รอตรวจสอบ</small><strong>{analytics.underReview}</strong><span>ฉบับ</span></Link>
+      </div>
+      <div className="mou-analytics-grid">
+        <article className="mou-analytics-panel">
+          <div className="mou-panel-heading"><div><h3>คิวติดตามต่ออายุ</h3><p>เรียงตามวันสิ้นสุดที่ใกล้ที่สุด</p></div><Link href="/mou?renewal=90">ดูทั้งหมด</Link></div>
+          {analytics.renewals.length > 0 ? <div className="renewal-list">{analytics.renewals.map((item) => <Link href={`/mou/${item.id}`} key={item.id} className="renewal-row"><span><strong>{item.title}</strong><small>{item.partner}</small></span><span><strong>{formatThaiDate(item.endDate)}</strong><small>เหลือ {item.daysRemaining} วัน</small></span></Link>)}</div> : <p className="analytics-empty">ยังไม่มี MOU ที่สิ้นสุดภายใน 90 วัน</p>}
+        </article>
+        <article className="mou-analytics-panel">
+          <div className="mou-panel-heading"><div><h3>หน่วยงานเจ้าของ</h3><p>จำนวน MOU ตามหน่วยงาน ม.พะเยา</p></div></div>
+          <div className="ranked-bars">{analytics.ownerUnits.map((item) => <Link href={`/mou?owner=${encodeURIComponent(item.name)}`} className="ranked-bar" key={item.name}><span><strong>{item.name}</strong><small>{item.count} ฉบับ</small></span><i style={{ "--bar-value": `${(item.count / maxOwnerCount) * 100}%` } as React.CSSProperties} /></Link>)}</div>
+        </article>
+        <article className="mou-analytics-panel">
+          <div className="mou-panel-heading"><div><h3>ประเทศคู่ความร่วมมือ</h3><p>อ้างอิง country snapshot ของ MOU</p></div></div>
+          <div className="ranked-bars">{analytics.countries.map((item) => <Link href={`/mou?country=${encodeURIComponent(item.name)}`} className="ranked-bar" key={item.name}><span><strong>{item.name}</strong><small>{item.count} ฉบับ</small></span><i style={{ "--bar-value": `${(item.count / maxCountryCount) * 100}%` } as React.CSSProperties} /></Link>)}</div>
+        </article>
+      </div>
+    </section>
+  );
+}
+
+function formatThaiDate(value: string) {
+  return new Intl.DateTimeFormat("th-TH", { day: "numeric", month: "short", year: "numeric" }).format(new Date(value));
 }
 
 function ActivityList({ liveMode = false }: { liveMode?: boolean }) {
@@ -455,8 +523,9 @@ export function DashboardWorkspace({
             ) : null}
           </div>
 
-          <PriorityList query={query} liveMode={Boolean(snapshot)} />
+          <PriorityList query={query} mouAnalytics={snapshot?.mouAnalytics} />
           <ModuleOverview access={access} snapshot={snapshot} />
+          <MouAnalyticsOverview analytics={snapshot?.mouAnalytics} />
           <div className="lower-grid">
             <ActivityList liveMode={Boolean(snapshot)} />
             <UpcomingList liveMode={Boolean(snapshot)} />
