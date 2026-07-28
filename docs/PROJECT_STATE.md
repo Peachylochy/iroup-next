@@ -1,7 +1,7 @@
 # iROUP Next: Project State
 
 อัปเดตล่าสุด: 28 กรกฎาคม 2569
-สถานะ: MOU core, detail, private attachment, list/filter/export และ local legacy-data verification ปิดรอบแล้ว; พร้อมเข้าสู่ MOU analytics planning และ Mobility matrix review
+สถานะ: MOU core, detail, private attachment, list/filter/export และ analytics ปิดรอบแล้ว; Mobility นิสิต Stage 1 ปิด migration/RLS/RPC/pgTAP แล้ว พร้อมเริ่ม UI
 
 > ก่อนสร้างโมดูลใหม่หรือขยาย MOU ให้ใช้ `docs/LEGACY_FUNCTION_INVENTORY.md`
 > เป็น baseline และทำ preserve/improve/retire matrix ของโมดูลนั้นก่อนเสมอ
@@ -57,6 +57,12 @@ iROUP Next เป็นระบบใหม่ที่พัฒนาด้ว
   - `20260727075135_mou_legacy_field_contract`
   - `20260727084026_remove_mou_file_retention`
   - `20260728000000_mou_attachments_and_storage`
+- Mobility Stage 1 migration `20260728150616_student_mobility_stage_1` ทดสอบบน Local Supabase แล้ว:
+  เพิ่มเวลาไป-กลับ, snapshot ของคู่ความร่วมมือ/ประเทศ, snapshot ของนิสิต, workflow events และ guarded RPC
+  สำหรับ draft, participant, funding, review, approve, activate และ complete โดยปิด direct write เฉพาะ `student_mobility`
+- `supabase/tests/student_mobility_stage_1_test.sql` ผ่าน 11/11: anon ถูกปิด, Editor ทำ draft/participant/submit ได้,
+  Publisher อนุมัติได้ และผู้มีสิทธิ์ `travel` อย่างเดียวเข้าถึง Mobility ไม่ได้
+- Local Security Advisor (warn/error) ไม่พบ issue หลัง migration Mobility
 - ทดสอบสิทธิ์ MOU บน remote database ด้วย transaction rollback ผ่าน: direct write
   ถูกปิด, Editor สร้าง/ส่งตรวจได้แต่เผยแพร่ไม่ได้, Publisher เผยแพร่ได้ และ Viewer ถูกปฏิเสธ
 - เพิ่มและรัน pgTAP test ที่ `supabase/tests/mou_write_workflow_test.sql` บน local
@@ -97,9 +103,9 @@ iROUP Next เป็นระบบใหม่ที่พัฒนาด้ว
 
 ## จุดเริ่มงานครั้งถัดไป
 
-1. Review `docs/MOU_ANALYTICS_SCOPE.md`, then implement MOU KPI/renewal/owner-unit analytics with RLS-tested aggregates and drill-down filters.
-2. Review `docs/MOBILITY_PRESERVE_IMPROVE_RETIRE_MATRIX.md` before implementing Mobility or official travel.
-3. After matrix approval, inspect legacy field/API contracts and write the Movement migration/RLS/RPC/test plan before UI work.
+1. ทำ list/detail/form ของ Mobility นิสิตบน movement core เดียว โดยต่อกับ guarded RPC ที่ผ่าน test แล้ว
+2. ทำ internal attachment workflow หลังยืนยัน storage integration; ยังไม่เชื่อม SharePoint อัตโนมัติจนกว่า CITCOMS อนุมัติ Graph API
+3. ทำ import preview/review สำหรับข้อมูล 407/408 แถว โดยยังไม่ commit จริง; `staff_mobility` และ `staff_official_travel` ค่อยต่อยอดตาม category contract
 
 ## ข้อควรจำ
 

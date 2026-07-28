@@ -1,6 +1,6 @@
 # Mobility and Official Travel — Preserve / Improve / Retire Matrix
 
-สถานะ: **เอกสารพร้อมทบทวนก่อนเริ่ม migration หรือ UI**  
+สถานะ: **ยืนยันให้เริ่ม Stage 1: Mobility นิสิต โดยยังไม่เริ่ม import ข้อมูลเดิม**
 Baseline: `docs/LEGACY_FUNCTION_INVENTORY.md`, legacy `mobility.html`, legacy travel module, `docs/architecture/02-domain-model.md`
 
 ## ขอบเขตที่ยืนยันแล้ว
@@ -39,7 +39,7 @@ Baseline: `docs/LEGACY_FUNCTION_INVENTORY.md`, legacy `mobility.html`, legacy tr
 | พื้นที่ | สิทธิ์ที่ใช้ |
 | --- | --- |
 | Mobility นิสิต/บุคลากร | module `mobility` |
-| เดินทางไปปฏิบัติงาน | module `official_travel` |
+| เดินทางไปปฏิบัติงาน | module `travel` |
 | การเผยแพร่ public | ต้องมีสิทธิ์ publish ของโมดูลนั้น และผ่าน public-safe DTO |
 | ไฟล์, ข้อมูลผู้เข้าร่วม, PII, notes | internal only; RLS และ signed URL เป็นตัวบังคับ |
 
@@ -53,6 +53,15 @@ Baseline: `docs/LEGACY_FUNCTION_INVENTORY.md`, legacy `mobility.html`, legacy tr
 4. ทำ list/detail/form ของหนึ่ง category บน core เดียว แล้วขยาย category ที่เหลือด้วย field/workflow contract
 5. ทำ participant/budget/attachment/import review และทดสอบสิทธิ์ทุก action
 6. ทำ dashboard/report; Public Portal และ map เป็นรอบแยกหลังข้อมูลและ permission พร้อม
+
+## การตัดสินใจสำหรับ Stage 1
+
+- เริ่มจาก `student_mobility` เท่านั้น เพื่อพิสูจน์ movement core ด้วย workflow และ field contract ที่ชัดเจนหนึ่งชุด
+- ใช้ workflow เดียวกันกับแกนระบบ: `draft → under_review → approved → active → completed`; `cancelled` และ `archived` เป็นสถานะปลายทาง
+- การเผยแพร่ public แยกจาก workflow ภายใน และ **ยังไม่อยู่ใน Stage 1**
+- ฟอร์มรอบแรกต้องรองรับโครงการ, วันไป-กลับ, direction, ประเทศ/คู่ความร่วมมือ, หน่วยงานเจ้าของ, ผู้เข้าร่วม, งบประมาณ และเอกสารภายใน
+- ข้อมูลนิสิตจากระบบต้นทางและ Excel ใช้ได้เฉพาะผ่าน staging/review; รอบแรกทำ contract และ preview ก่อน ไม่เขียนข้อมูลจริงจากไฟล์โดยตรง
+- `staff_mobility`, `staff_official_travel` และ `visiting_delegation` จะต่อยอดจาก core และไม่เปลี่ยน permission boundary
 
 ## Import guardrail
 
