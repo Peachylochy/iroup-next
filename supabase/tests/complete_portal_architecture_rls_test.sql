@@ -35,7 +35,7 @@ select results_eq(
       and relkind = 'r'
       and relrowsecurity
   $$,
-  array[24::bigint],
+  array[25::bigint],
   'RLS is enabled on every public base table'
 );
 
@@ -132,7 +132,8 @@ values (
   'JPN',
   'ญี่ปุ่น',
   'Japan'
-);
+)
+on conflict (iso2) do update set id = excluded.id;
 
 insert into public.organization_units (id, code, name_th, name_en)
 values (
@@ -164,6 +165,7 @@ insert into public.agreements (
   fiscal_year,
   status,
   publication_status,
+  workflow_status,
   public_visible,
   created_by
 )
@@ -177,6 +179,7 @@ values
     2569,
     'active',
     'published',
+    'active',
     true,
     '11000000-0000-0000-0000-000000000001'
   ),
@@ -187,6 +190,7 @@ values
     '2026-01-01',
     null,
     2569,
+    'draft',
     'draft',
     'draft',
     false,
