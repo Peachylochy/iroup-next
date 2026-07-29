@@ -9,6 +9,7 @@ import {
   ChevronDown,
   FileClock,
   FilePenLine,
+  KeyRound,
   LockKeyhole,
   LogOut,
   Menu,
@@ -451,13 +452,33 @@ export function DashboardWorkspace({
             </Button>
             <Separator orientation="vertical" className="account-separator" />
             <div className="account">
-              <Avatar size="lg">
-                <AvatarFallback>{initials || "UP"}</AvatarFallback>
-              </Avatar>
-              <span>
-                <strong>{viewer.displayName}</strong>
-                <small>{viewer.role}</small>
-              </span>
+              {access ? (
+                <Link
+                  href="/settings/account"
+                  className="inline-flex items-center gap-2 rounded-lg px-1 py-0.5 transition-colors hover:bg-muted"
+                  aria-label="เปิดหน้าบัญชีและเปลี่ยนรหัสผ่าน"
+                  title="บัญชีของฉัน / เปลี่ยนรหัสผ่าน"
+                >
+                  <Avatar size="lg">
+                    <AvatarFallback>{initials || "UP"}</AvatarFallback>
+                  </Avatar>
+                  <span>
+                    <strong>{viewer.displayName}</strong>
+                    <small>{viewer.role}</small>
+                  </span>
+                  <KeyRound className="size-4 text-muted-foreground" />
+                </Link>
+              ) : (
+                <>
+                  <Avatar size="lg">
+                    <AvatarFallback>{initials || "UP"}</AvatarFallback>
+                  </Avatar>
+                  <span>
+                    <strong>{viewer.displayName}</strong>
+                    <small>{viewer.role}</small>
+                  </span>
+                </>
+              )}
               {access ? (
                 <form action={signOutAction}>
                   <Button

@@ -2,6 +2,7 @@ import {
   BookOpenText,
   BriefcaseBusiness,
   Database,
+  KeyRound,
   CalendarDays,
   ContactRound,
   FileClock,
@@ -106,6 +107,7 @@ export const navigationGroups = [
     icon: Settings,
     module: "settings",
     children: [
+      { label: "บัญชีของฉัน", href: "/settings/account", icon: KeyRound, module: "settings" },
       { label: "ผู้ใช้และสิทธิ์", href: "/settings/users", icon: UsersRound, module: "settings" },
       { label: "นำเข้าข้อมูล master", href: "/settings/master-import", icon: Database, module: "settings" },
     ],
