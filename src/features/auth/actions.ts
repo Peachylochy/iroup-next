@@ -21,6 +21,23 @@ const signUpSchema = z.object({
   password: z.string().min(8, "รหัสผ่านต้องมีอย่างน้อย 8 ตัวอักษร"),
 });
 
+const changePasswordSchema = z
+  .object({
+    currentPassword: z.string().min(1, "กรุณากรอกรหัสผ่านปัจจุบัน"),
+    newPassword: z
+      .string()
+      .min(8, "รหัสผ่านใหม่ต้องมีอย่างน้อย 8 ตัวอักษร"),
+    confirmPassword: z.string().min(1, "กรุณายืนยันรหัสผ่านใหม่"),
+  })
+  .refine((value) => value.newPassword === value.confirmPassword, {
+    message: "ยืนยันรหัสผ่านใหม่ไม่ตรงกัน",
+    path: ["confirmPassword"],
+  })
+  .refine((value) => value.currentPassword !== value.newPassword, {
+    message: "รหัสผ่านใหม่ต้องไม่ซ้ำกับรหัสผ่านปัจจุบัน",
+    path: ["newPassword"],
+  });
+
 export async function signInAction(
   _previousState: AuthActionState,
   formData: FormData,
@@ -86,4 +103,48 @@ export async function signOutAction() {
   const supabase = await createClient();
   await supabase.auth.signOut();
   redirect("/login");
+}
+
+export async function changePasswordAction(
+  _previousState: AuthActionState,
+  formData: FormData,
+): Promise<AuthActionState> {
+  const parsed = changePasswordSchema.safeParse({
+    currentPassword: formData.get("currentPassword"),
+    newPassword: formData.get("newPassword"),
+    confirmPassword: formData.get("confirmPassword"),
+  });
+
+  if (!parsed.success) {
+    return {
+      message: parsed.error.issues[0]?.message ?? "ข้อมูลไม่ถูกต้อง",
+    };
+  }
+
+  const supabase = await createClient();
+  const { data: userData, error: userError } = await supabase.auth.getUser();
+  const email = userData.user?.email;
+
+  if (userError || !email) {
+    return { message: "ไม่พบเซสชันผู้ใช้งาน กรุณาเข้าสู่ระบบใหม่" };
+  }
+
+  const { error: verifyError } = await supabase.auth.signInWithPassword({
+    email,
+    password: parsed.data.currentPassword,
+  });
+
+  if (verifyError) {
+    return { message: "รหัสผ่านปัจจุบันไม่ถูกต้อง" };
+  }
+
+  const { error: updateError } = await supabase.auth.updateUser({
+    password: parsed.data.newPassword,
+  });
+
+  if (updateError) {
+    return { message: "เปลี่ยนรหัสผ่านไม่สำเร็จ กรุณาลองอีกครั้ง" };
+  }
+
+  return { message: "เปลี่ยนรหัสผ่านเรียบร้อยแล้ว", success: true };
 }
