@@ -7,18 +7,20 @@
 - Browser QA used the real `IROUP_DATABASE_PRODUCTION.xlsx`. The confirmed local batch is `3f87cf08-90b3-49bc-936d-42c5f9089527`, now status `completed`, with all 26,999 source rows committed through the System Admin UI.
 - Migration `20260729150215_master_import_commit_rpc` adds an atomic, admin-only `commit_master_import_batch` RPC. It validates every source reference before writing, then upserts countries → units → partner organizations → people in one transaction.
 - Local database readback after the browser commit: 249 countries, 57 organization units, 102 partner organizations, 22,888 students, 3,752 staff, and 26,640 people. Partner-country and person-unit mappings with a source reference have 0 unresolved rows.
-- RLS protects staging and the commit RPC for System Admin only. `pnpm typecheck` and all master pgTAP tests pass (13/13). This is a Local Supabase import; the remote production project has not been changed.
+- RLS protects staging and the commit RPC for System Admin only. `pnpm typecheck` and all master pgTAP tests pass (13/13).
+- Production project `iroup-next` now has all six pending Mobility/Master migrations. It had no Auth users, so the initial master seed was written through the service role directly to the empty master tables rather than through `import_batches` (which correctly requires `created_by`). Production readback: 249 countries, 57 organization units, 53 partner organizations, 22,888 students, 3,752 staff, and 0 orphan country/unit links.
 
 ### Next decision gates
 
-1. Use the committed master tables as the source of truth for Mobility mapping and forms.
-2. Re-run the Mobility project/participant import preview against the populated masters, resolve only genuinely unknown values, then stage Mobility projects and participants separately.
-3. Keep any future master workbook import behind the same preview → explicit `IMPORT MASTER` confirmation → atomic commit flow.
+1. Create and approve the first Production System Admin account before opening the production portal; this is required for the normal staging/commit UI and its audit trail.
+2. Use the committed master tables as the source of truth for Mobility mapping and forms.
+3. Re-run the Mobility project/participant import preview against the populated masters, resolve only genuinely unknown values, then stage Mobility projects and participants separately.
+4. Keep any future master workbook import behind the same preview → explicit `IMPORT MASTER` confirmation → atomic commit flow.
 
 > The master batch is complete. Mobility project and participant rows have not yet been written from this workbook.
 
 อัปเดตล่าสุด: 29 กรกฎาคม 2569
-สถานะ: MOU core ปิดรอบแล้ว; Mobility นิสิต Stage 1 พร้อมใช้งานใน local และ Master Import ถูก commit แล้ว — พร้อมนำ master ไปใช้กับ mapping/import ของ Mobility ต่อ
+สถานะ: MOU core ปิดรอบแล้ว; Mobility นิสิต Stage 1 พร้อมใช้งานใน local และ master ถูก seed ครบทั้ง local/production แล้ว — production รอสร้าง System Admin คนแรกก่อนเปิดใช้งานผ่านหน้าจอ
 
 > ก่อนสร้างโมดูลใหม่หรือขยาย MOU ให้ใช้ `docs/LEGACY_FUNCTION_INVENTORY.md`
 > เป็น baseline และทำ preserve/improve/retire matrix ของโมดูลนั้นก่อนเสมอ
@@ -128,8 +130,9 @@ iROUP Next เป็นระบบใหม่ที่พัฒนาด้ว
 
 ## จุดเริ่มงานครั้งถัดไป
 
-1. รัน preview ของ Mobility นิสิตจาก `IROUP_DATABASE_PRODUCTION.xlsx` อีกครั้ง โดยอ้างอิง master ที่ commit แล้ว: หน้าตรวจนำเข้ากรองสีส้ม/แดงได้, เลือกประเทศ/องค์กร/หน่วยงานอ้างอิงได้, เลือก “ยังระบุองค์กรไม่ได้” พร้อมหมายเหตุติดตามได้ และ System Admin เพิ่มประเทศ (ชื่อไทย/อังกฤษ + ISO), องค์กรแบบ `pending_verification` หรือหน่วยงานได้
-2. เมื่อเจ้าหน้าที่ตรวจและเลือก mapping ของ Mobility ครบ ให้สร้าง staging batch/review ที่บันทึกเฉพาะรายการและ mapping ที่ผ่านการตรวจ แล้วค่อยขออนุมัติ commit Mobility แยกต่างหาก
+1. สร้าง/อนุมัติบัญชี System Admin คนแรกใน production แล้วจึงตั้งค่า environment/deploy portal ให้ชี้ไปยัง production
+2. รัน preview ของ Mobility นิสิตจาก `IROUP_DATABASE_PRODUCTION.xlsx` อีกครั้ง โดยอ้างอิง master ที่ commit แล้ว: หน้าตรวจนำเข้ากรองสีส้ม/แดงได้, เลือกประเทศ/องค์กร/หน่วยงานอ้างอิงได้, เลือก “ยังระบุองค์กรไม่ได้” พร้อมหมายเหตุติดตามได้ และ System Admin เพิ่มประเทศ (ชื่อไทย/อังกฤษ + ISO), องค์กรแบบ `pending_verification` หรือหน่วยงานได้
+3. เมื่อเจ้าหน้าที่ตรวจและเลือก mapping ของ Mobility ครบ ให้สร้าง staging batch/review ที่บันทึกเฉพาะรายการและ mapping ที่ผ่านการตรวจ แล้วค่อยขออนุมัติ commit Mobility แยกต่างหาก
 3. ทำ internal attachment workflow หลังยืนยัน storage integration; ยังไม่เชื่อม SharePoint อัตโนมัติจนกว่า CITCOMS อนุมัติ Graph API
 4. `staff_mobility` และ `staff_official_travel` ค่อยต่อยอดตาม category contract
 
