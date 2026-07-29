@@ -1,0 +1,6 @@
+# Local-only source workbooks and documents must never be uploaded in a deployment.
+assets/
+
+# Local development services and secrets.
+supabase/.temp/
+.env.local
