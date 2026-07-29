@@ -9,10 +9,11 @@
 - Local database readback after the browser commit: 249 countries, 57 organization units, 102 partner organizations, 22,888 students, 3,752 staff, and 26,640 people. Partner-country and person-unit mappings with a source reference have 0 unresolved rows.
 - RLS protects staging and the commit RPC for System Admin only. `pnpm typecheck` and all master pgTAP tests pass (13/13).
 - Production project `iroup-next` now has all six pending Mobility/Master migrations. It had no Auth users, so the initial master seed was written through the service role directly to the empty master tables rather than through `import_batches` (which correctly requires `created_by`). Production readback: 249 countries, 57 organization units, 53 partner organizations, 22,888 students, 3,752 staff, and 0 orphan country/unit links.
+- The first production account `thratip.so@up.ac.th` is active and verified as `system_admin` through a real password sign-in and `current_user_access` RPC readback. A temporary password was delivered directly to the account owner and must be changed after first production login.
 
 ### Next decision gates
 
-1. Create and approve the first Production System Admin account before opening the production portal; this is required for the normal staging/commit UI and its audit trail.
+1. Configure production environment variables and deploy the portal; the first Production System Admin account is ready to sign in.
 2. Use the committed master tables as the source of truth for Mobility mapping and forms.
 3. Re-run the Mobility project/participant import preview against the populated masters, resolve only genuinely unknown values, then stage Mobility projects and participants separately.
 4. Keep any future master workbook import behind the same preview → explicit `IMPORT MASTER` confirmation → atomic commit flow.
@@ -20,7 +21,7 @@
 > The master batch is complete. Mobility project and participant rows have not yet been written from this workbook.
 
 อัปเดตล่าสุด: 29 กรกฎาคม 2569
-สถานะ: MOU core ปิดรอบแล้ว; Mobility นิสิต Stage 1 พร้อมใช้งานใน local และ master ถูก seed ครบทั้ง local/production แล้ว — production รอสร้าง System Admin คนแรกก่อนเปิดใช้งานผ่านหน้าจอ
+สถานะ: MOU core ปิดรอบแล้ว; Mobility นิสิต Stage 1 พร้อมใช้งานใน local และ master ถูก seed ครบทั้ง local/production แล้ว — System Admin production พร้อมแล้ว เหลือกำหนด environment/deploy portal
 
 > ก่อนสร้างโมดูลใหม่หรือขยาย MOU ให้ใช้ `docs/LEGACY_FUNCTION_INVENTORY.md`
 > เป็น baseline และทำ preserve/improve/retire matrix ของโมดูลนั้นก่อนเสมอ
@@ -130,7 +131,7 @@ iROUP Next เป็นระบบใหม่ที่พัฒนาด้ว
 
 ## จุดเริ่มงานครั้งถัดไป
 
-1. สร้าง/อนุมัติบัญชี System Admin คนแรกใน production แล้วจึงตั้งค่า environment/deploy portal ให้ชี้ไปยัง production
+1. ตั้งค่า environment และ deploy portal ให้ชี้ไปยัง production; บัญชี System Admin คนแรกพร้อมใช้งานแล้ว
 2. รัน preview ของ Mobility นิสิตจาก `IROUP_DATABASE_PRODUCTION.xlsx` อีกครั้ง โดยอ้างอิง master ที่ commit แล้ว: หน้าตรวจนำเข้ากรองสีส้ม/แดงได้, เลือกประเทศ/องค์กร/หน่วยงานอ้างอิงได้, เลือก “ยังระบุองค์กรไม่ได้” พร้อมหมายเหตุติดตามได้ และ System Admin เพิ่มประเทศ (ชื่อไทย/อังกฤษ + ISO), องค์กรแบบ `pending_verification` หรือหน่วยงานได้
 3. เมื่อเจ้าหน้าที่ตรวจและเลือก mapping ของ Mobility ครบ ให้สร้าง staging batch/review ที่บันทึกเฉพาะรายการและ mapping ที่ผ่านการตรวจ แล้วค่อยขออนุมัติ commit Mobility แยกต่างหาก
 3. ทำ internal attachment workflow หลังยืนยัน storage integration; ยังไม่เชื่อม SharePoint อัตโนมัติจนกว่า CITCOMS อนุมัติ Graph API
