@@ -1,5 +1,23 @@
 # iROUP Next: Project State
 
+## Current verified checkpoint — 1 August 2026
+
+The local integration work is now pushed and deployed.
+
+- GitHub branch: `agent/student-mobility-import-preview`
+- Latest feature/deploy commit: `2290719 chore: exclude local dev logs from deploy`
+- Feature commit: `6c7ccd7 feat: connect portal modules and import workflows`
+- Draft PR: [#13](https://github.com/Peachylochy/iroup-next/pull/13)
+- Production deployment: `dpl_5XXRp6UWXPqBLzRZeNzTTW38u9ao`
+- Production URL: https://iroup-next.vercel.app
+- Supabase production migrations through `20260730210000` are applied and verified
+- Production RPC/function readback passed for mobility, staff movement, MOU, contacts, and legacy import commit paths
+- Local checks passed: `pnpm.cmd typecheck`, `pnpm.cmd test` (4/4), `pnpm.cmd lint`, and `pnpm.cmd build`
+- Production HTTP smoke checks passed: `/login` returned 200; protected `/mou` redirected to login
+- Local-only `assets/` and `.codex-dev*.log` are excluded from GitHub/Vercel
+
+Production currently contains master data but no committed legacy MOU, contact, or travel transaction records yet. Those imports remain a separate staging/review/explicit-commit step.
+
 อัปเดตล่าสุด: 30 กรกฎาคม 2569
 สถานะการทำงาน: **หยุดพักตามคำสั่งผู้ใช้ หลังจบ Local integration รอบ MOU, Contacts และ Travel**
 Branch ปัจจุบัน: `agent/student-mobility-import-preview`
