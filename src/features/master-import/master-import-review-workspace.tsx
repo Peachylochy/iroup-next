@@ -112,7 +112,11 @@ export function MasterImportReviewWorkspace({ batchId, access, viewer }: { batch
     setError(undefined); setData(body);
   }, [batchId, filter]);
 
-  useEffect(() => { void load(); }, [load]);
+  useEffect(() => {
+    // Fetch and synchronize the staging review after the batch/filter changes.
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- async data synchronization
+    void load();
+  }, [load]);
 
   async function commitMaster() {
     setCommitting(true); setCommitMessage(undefined);

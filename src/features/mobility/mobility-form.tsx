@@ -4,34 +4,64 @@ import { useActionState, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { ArrowLeft, CheckCircle2, FileCheck2, Plus, Save, Trash2, UsersRound, WalletCards } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { MasterSearchSelect } from "@/components/forms/master-search-select";
+import { PersonMasterSearch, type PersonMasterResult } from "@/components/forms/person-master-search";
 import { Input } from "@/components/ui/input";
 import { submitMobilityForm, type MobilityFormState } from "./actions";
+import { deriveThaiFiscalYear } from "./fiscal-year";
 import type { MobilityFormOptions, MobilityFormRecord } from "./mobility-query";
 
 type Props = { mobility: MobilityFormRecord | null; options: MobilityFormOptions };
-type Participant = { full_name_snapshot: string; student_id_snapshot: string; faculty_snapshot: string; study_program_snapshot: string; study_level_snapshot: string; participant_role: string };
+type Participant = {
+  person_id: string | null;
+  person_source: "student" | "staff" | "external" | "manual";
+  full_name_snapshot: string;
+  organization_unit_id_snapshot: string | null;
+  organization_unit_name_snapshot: string;
+  student_id_snapshot: string;
+  faculty_snapshot: string;
+  study_program_snapshot: string;
+  study_level_snapshot: string;
+  participant_role: string;
+};
 type Funding = { budget_type: string; source_name: string; amount: string; currency: string };
 const initialState: MobilityFormState = {};
 
-function thaiFiscalYear(value: string) {
-  if (!value) return "";
-  const [year, month] = value.split("-").map(Number);
-  return year && month ? String(year + 543 + (month >= 10 ? 1 : 0)) : "";
-}
-
 export function MobilityForm({ mobility, options }: Props) {
   const [state, action, pending] = useActionState(submitMobilityForm, initialState);
-  const [participants, setParticipants] = useState<Participant[]>(() => mobility?.movement_participants.map((item) => ({ full_name_snapshot: item.full_name_snapshot, student_id_snapshot: item.student_id_snapshot ?? "", faculty_snapshot: item.faculty_snapshot ?? "", study_program_snapshot: item.study_program_snapshot ?? "", study_level_snapshot: item.study_level_snapshot ?? "", participant_role: item.participant_role ?? "นิสิต" })) ?? []);
+  const [participants, setParticipants] = useState<Participant[]>(() => mobility?.movement_participants.map((item) => ({
+    person_id: item.person_id,
+    person_source: item.person_source ?? "student",
+    full_name_snapshot: item.full_name_snapshot,
+    organization_unit_id_snapshot: item.organization_unit_id_snapshot,
+    organization_unit_name_snapshot: item.organization_unit_name_snapshot ?? item.faculty_snapshot ?? "",
+    student_id_snapshot: item.student_id_snapshot ?? "",
+    faculty_snapshot: item.faculty_snapshot ?? "",
+    study_program_snapshot: item.study_program_snapshot ?? "",
+    study_level_snapshot: item.study_level_snapshot ?? "",
+    participant_role: item.participant_role ?? "นิสิต",
+  })) ?? []);
   const [funding, setFunding] = useState<Funding[]>(() => mobility?.movement_funding.map((item) => ({ budget_type: item.budget_type, source_name: item.source_name ?? "", amount: item.amount?.toString() ?? "", currency: item.currency })) ?? []);
   const [startDate, setStartDate] = useState(mobility?.start_date ?? "");
   const isLocked = mobility?.workflow_status !== undefined && mobility.workflow_status !== "draft";
-  const currentYear = useMemo(() => thaiFiscalYear(startDate), [startDate]);
+  const currentYear = useMemo(() => deriveThaiFiscalYear(startDate), [startDate]);
 
   useEffect(() => {
     if (state.id && !mobility) window.location.assign(`/mobility/${state.id}?created=1`);
   }, [mobility, state.id]);
 
-  const addParticipant = () => setParticipants((items) => [...items, { full_name_snapshot: "", student_id_snapshot: "", faculty_snapshot: "", study_program_snapshot: "", study_level_snapshot: "", participant_role: "นิสิต" }]);
+  const addParticipant = () => setParticipants((items) => [...items, {
+    person_id: null,
+    person_source: "student",
+    full_name_snapshot: "",
+    organization_unit_id_snapshot: null,
+    organization_unit_name_snapshot: "",
+    student_id_snapshot: "",
+    faculty_snapshot: "",
+    study_program_snapshot: "",
+    study_level_snapshot: "",
+    participant_role: "นิสิต",
+  }]);
   const addFunding = () => setFunding((items) => [...items, { budget_type: "", source_name: "", amount: "", currency: "THB" }]);
 
   return <main className="module-main mou-form-page">
@@ -65,16 +95,16 @@ export function MobilityForm({ mobility, options }: Props) {
 
       <section className="mou-form-section"><div className="mou-form-section-heading"><span>2</span><div><h2>ปลายทางและหน่วยงาน</h2><p>เลือกข้อมูลจากคลังกลาง เพื่อเก็บประวัติและรายงานได้ถูกต้อง</p></div></div>
         <div className="mou-form-grid">
-          <label className="mou-field">ประเทศ *<select name="country_id" defaultValue={mobility?.country_id ?? ""} disabled={isLocked}><option value="">เลือกประเทศ</option>{options.countries.map((country) => <option key={country.id} value={country.id}>{country.name_th} ({country.name_en})</option>)}</select></label>
+          <label className="mou-field">ประเทศ *<MasterSearchSelect name="country_id" value={mobility?.country_id ?? ""} disabled={isLocked} placeholder="ค้นหาและเลือกประเทศ" options={options.countries.map((country) => ({ value: country.id, label: country.name_th, description: country.name_en }))} /></label>
           <label className="mou-field">เมือง<Input name="city" defaultValue={mobility?.city ?? ""} disabled={isLocked} /></label>
-          <label className="mou-field mou-field-wide">องค์กร/สถาบันคู่ความร่วมมือ<select name="partner_organization_id" defaultValue={mobility?.partner_organization_id ?? ""} disabled={isLocked}><option value="">ยังไม่ระบุ</option>{options.partners.map((partner) => <option key={partner.id} value={partner.id}>{partner.name_th || partner.name_en}</option>)}</select></label>
-          <label className="mou-field mou-field-wide">หน่วยงานเจ้าของ ม.พะเยา *<select name="owner_unit_id" defaultValue={mobility?.owner_unit_id ?? ""} disabled={isLocked}><option value="">เลือกหน่วยงาน</option>{options.units.map((unit) => <option key={unit.id} value={unit.id}>{unit.name_th}</option>)}</select></label>
+          <label className="mou-field mou-field-wide">องค์กร/สถาบันคู่ความร่วมมือ<MasterSearchSelect name="partner_organization_id" value={mobility?.partner_organization_id ?? ""} disabled={isLocked} placeholder="ค้นหาและเลือกองค์กร (เว้นว่างได้)" options={options.partners.map((partner) => ({ value: partner.id, label: partner.name_th || partner.name_en, description: partner.name_th ? partner.name_en : null }))} /></label>
+          <label className="mou-field mou-field-wide">หน่วยงานเจ้าของ ม.พะเยา *<MasterSearchSelect name="owner_unit_id" value={mobility?.owner_unit_id ?? ""} disabled={isLocked} required placeholder="ค้นหาและเลือกหน่วยงาน" options={options.units.map((unit) => ({ value: unit.id, label: unit.name_th, description: unit.name_en }))} /></label>
         </div>
       </section>
 
       <section className="mou-form-section"><div className="mou-form-section-heading"><span>3</span><div><h2>วันเวลาและการอนุมัติ</h2><p>วันกลับยังว่างได้ในร่าง แต่ระบบตรวจลำดับเวลาทันทีเมื่อระบุ</p></div></div>
         <div className="mou-form-grid">
-          <label className="mou-field">วันเริ่มเดินทาง *<Input type="date" name="start_date" value={startDate} onChange={(event) => setStartDate(event.currentTarget.value)} disabled={isLocked} /></label>
+          <label className="mou-field">วันเริ่มเดินทาง *<Input type="date" name="start_date" defaultValue={startDate} onChange={(event) => setStartDate(event.currentTarget.value)} disabled={isLocked} /></label>
           <label className="mou-field">วันกลับ<Input type="date" name="end_date" defaultValue={mobility?.end_date ?? ""} disabled={isLocked} /></label>
           <label className="mou-field">เวลาออกเดินทาง<Input type="datetime-local" name="departure_at" defaultValue={mobility?.departure_at?.slice(0, 16) ?? ""} disabled={isLocked} /></label>
           <label className="mou-field">เวลากลับ<Input type="datetime-local" name="return_at" defaultValue={mobility?.return_at?.slice(0, 16) ?? ""} disabled={isLocked} /></label>
@@ -85,7 +115,34 @@ export function MobilityForm({ mobility, options }: Props) {
       </section>
 
       <section className="mou-form-section"><div className="mou-form-section-heading"><span>4</span><div><h2><UsersRound /> ผู้เข้าร่วม</h2><p>เพิ่มเป็นรายบุคคลในรอบนี้; การนำเข้าแบบ batch จะทำเป็น preview แยกต่างหาก</p></div></div>
-        <div className="space-y-3">{participants.map((participant, index) => <div className="grid grid-cols-1 md:grid-cols-3 gap-3 border border-border p-3" key={index}>
+        <div className="space-y-3">{participants.map((participant, index) => <div className="mobility-participant-editor" key={index}>
+          <div className="mobility-participant-master">
+            <PersonMasterSearch
+              disabled={isLocked}
+              selected={participant.person_id ? {
+                id: participant.person_id,
+                personType: participant.person_source,
+                sourceIdentifier: participant.student_id_snapshot || null,
+                fullNameTh: participant.full_name_snapshot,
+                fullNameEn: null,
+                organizationUnitId: participant.organization_unit_id_snapshot,
+                organizationUnitName: participant.organization_unit_name_snapshot || null,
+                programOrPosition: participant.study_program_snapshot || null,
+              } : null}
+              onSelect={(person: PersonMasterResult | null) => setParticipants((items) => items.map((item, i) => i === index ? person ? {
+                ...item,
+                person_id: person.id,
+                person_source: person.personType,
+                full_name_snapshot: person.fullNameTh || person.fullNameEn || "",
+                organization_unit_id_snapshot: person.organizationUnitId,
+                organization_unit_name_snapshot: person.organizationUnitName || "",
+                student_id_snapshot: person.sourceIdentifier || "",
+                faculty_snapshot: person.organizationUnitName || "",
+                study_program_snapshot: person.programOrPosition || "",
+              } : { ...item, person_id: null, person_source: "manual" } : item))}
+            />
+          </div>
+          <p className="mobility-participant-hint">{participant.person_id ? "ผูกกับ Data Master แล้ว — snapshot ด้านล่างแก้เฉพาะรายการนี้ได้" : "ไม่พบใน Data Master สามารถกรอกด้วยตนเองได้"}</p>
           <Input placeholder="ชื่อ-นามสกุล *" value={participant.full_name_snapshot} disabled={isLocked} onChange={(e) => setParticipants((items) => items.map((item, i) => i === index ? { ...item, full_name_snapshot: e.target.value } : item))} />
           <Input placeholder="รหัสนิสิต" value={participant.student_id_snapshot} disabled={isLocked} onChange={(e) => setParticipants((items) => items.map((item, i) => i === index ? { ...item, student_id_snapshot: e.target.value } : item))} />
           <Input placeholder="คณะ" value={participant.faculty_snapshot} disabled={isLocked} onChange={(e) => setParticipants((items) => items.map((item, i) => i === index ? { ...item, faculty_snapshot: e.target.value } : item))} />

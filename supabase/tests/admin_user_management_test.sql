@@ -140,9 +140,17 @@ set local "request.jwt.claims" =
   '{"sub":"92000000-0000-0000-0000-000000000001","role":"authenticated"}';
 
 select is(
-  jsonb_array_length(public.admin_user_directory() -> 'users'),
+  (
+    select count(*)::integer
+    from jsonb_array_elements(public.admin_user_directory() -> 'users') user_record
+    where user_record ->> 'id' in (
+      '92000000-0000-0000-0000-000000000001',
+      '92000000-0000-0000-0000-000000000002',
+      '92000000-0000-0000-0000-000000000003'
+    )
+  ),
   3,
-  'a system administrator sees every user profile'
+  'a system administrator sees every profile created by this test'
 );
 
 select lives_ok(

@@ -42,7 +42,11 @@ export type MobilityFormRecord = Omit<StudentMobility, "organization_units"> & {
   internal_note: string | null;
   movement_participants: Array<{
     id: string;
+    person_id: string | null;
+    person_source: "student" | "staff" | "external" | "manual";
     full_name_snapshot: string;
+    organization_unit_id_snapshot: string | null;
+    organization_unit_name_snapshot: string | null;
     student_id_snapshot: string | null;
     faculty_snapshot: string | null;
     study_program_snapshot: string | null;
@@ -56,7 +60,11 @@ export type MobilityDetail = MobilityFormRecord & {
   created_at: string;
   movement_participants: Array<{
     id: string;
+    person_id: string | null;
+    person_source: "student" | "staff" | "external" | "manual";
     full_name_snapshot: string;
+    organization_unit_id_snapshot: string | null;
+    organization_unit_name_snapshot: string | null;
     student_id_snapshot: string | null;
     faculty_snapshot: string | null;
     study_program_snapshot: string | null;
@@ -111,7 +119,7 @@ export async function getMobilityForForm(id: string): Promise<MobilityFormRecord
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("movement_cases")
-    .select("id, project_name, title_en, purpose, direction, country_id, country_name_snapshot, partner_organization_id, partner_name_snapshot, city, owner_unit_id, activity_type, mobility_mode, participant_group, study_level, approval_reference, start_date, end_date, departure_at, return_at, fiscal_year, status, workflow_status, participant_count, internal_note, updated_at, movement_participants(id, full_name_snapshot, student_id_snapshot, faculty_snapshot, study_program_snapshot, study_level_snapshot, participant_role), movement_funding(id, budget_type, source_name, amount, currency)")
+    .select("id, project_name, title_en, purpose, direction, country_id, country_name_snapshot, partner_organization_id, partner_name_snapshot, city, owner_unit_id, activity_type, mobility_mode, participant_group, study_level, approval_reference, start_date, end_date, departure_at, return_at, fiscal_year, status, workflow_status, participant_count, internal_note, updated_at, movement_participants(id, person_id, person_source, full_name_snapshot, organization_unit_id_snapshot, organization_unit_name_snapshot, student_id_snapshot, faculty_snapshot, study_program_snapshot, study_level_snapshot, participant_role), movement_funding(id, budget_type, source_name, amount, currency)")
     .eq("id", id).eq("category", "student_mobility").is("deleted_at", null).maybeSingle();
   if (error) throw new Error(`Unable to load student mobility: ${error.message}`);
   return data as MobilityFormRecord | null;
@@ -123,7 +131,7 @@ export async function getMobilityDetail(id: string): Promise<MobilityDetail | nu
     .from("movement_cases")
     .select(`id, project_name, title_en, purpose, direction, country_id, country_name_snapshot, partner_organization_id, partner_name_snapshot, city, owner_unit_id, activity_type, mobility_mode, participant_group, study_level, approval_reference, start_date, end_date, departure_at, return_at, fiscal_year, status, workflow_status, participant_count, internal_note, updated_at, created_at,
       countries(name_th, name_en), partner_organizations(name_th, name_en), organization_units(name_th, name_en),
-      movement_participants(id, full_name_snapshot, student_id_snapshot, faculty_snapshot, study_program_snapshot, study_level_snapshot, participant_role),
+      movement_participants(id, person_id, person_source, full_name_snapshot, organization_unit_id_snapshot, organization_unit_name_snapshot, student_id_snapshot, faculty_snapshot, study_program_snapshot, study_level_snapshot, participant_role),
       movement_funding(id, budget_type, source_name, amount, currency),
       movement_workflow_events(id, action, from_status, to_status, note, created_at, profiles(display_name, email))`)
     .eq("id", id).eq("category", "student_mobility").maybeSingle();

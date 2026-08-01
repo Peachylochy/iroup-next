@@ -2,7 +2,7 @@ begin;
 
 create extension if not exists pgtap with schema extensions;
 
-select plan(11);
+select plan(12);
 
 select has_table('public', 'movement_workflow_events', 'movement workflow event table exists');
 select has_column('public', 'movement_cases', 'departure_at', 'movement cases stores departure time');
@@ -90,7 +90,27 @@ select lives_ok(
   'student mobility RPC workflow enforces direct-write, editor, and publisher boundaries'
 );
 
-select is((select count(*)::integer from public.movement_workflow_events), 4, 'create, participant edit, submit, and approve events are recorded');
+select is(
+  (
+    select count(*)::integer
+    from public.movement_workflow_events event
+    join public.movement_cases movement on movement.id = event.movement_id
+    where movement.project_name = 'Mobility RLS workflow test'
+  ),
+  4,
+  'create, participant edit, submit, and approve events are recorded'
+);
+select is(
+  (
+    select count(*)::integer
+    from public.movement_workflow_events event
+    join public.movement_cases movement on movement.id = event.movement_id
+    where event.action = 'participants_replaced'
+      and movement.project_name = 'Mobility RLS workflow test'
+  ),
+  1,
+  'participant replacement has a distinct audit action'
+);
 
 select lives_ok(
   $$
