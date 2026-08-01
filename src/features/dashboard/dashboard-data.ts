@@ -1,8 +1,11 @@
 import {
   BookOpenText,
   BriefcaseBusiness,
+  Database,
+  KeyRound,
   CalendarDays,
   ContactRound,
+  DatabaseBackup,
   FileClock,
   FilePenLine,
   GraduationCap,
@@ -36,7 +39,7 @@ export const navigationGroups = [
       },
       {
         label: "ผู้ติดต่อองค์กรต่างประเทศ",
-        href: "#module-overview",
+        href: "/mou/contacts",
         icon: ContactRound,
         module: "mou",
         internal: true,
@@ -57,13 +60,13 @@ export const navigationGroups = [
       },
       {
         label: "Mobility บุคลากร",
-        href: "#module-overview",
+        href: "/staff-mobility",
         icon: UsersRound,
         module: "mobility",
       },
       {
         label: "เดินทางไปปฏิบัติงาน",
-        href: "#module-overview",
+        href: "/travel",
         icon: BriefcaseBusiness,
         module: "travel",
       },
@@ -71,31 +74,31 @@ export const navigationGroups = [
   },
   {
     label: "ทุนการศึกษา",
-    href: "#activity",
+    href: "/scholarships",
     icon: GraduationCap,
     module: "scholarship",
   },
   {
     label: "กิจกรรม",
-    href: "#activity",
+    href: "/events",
     icon: CalendarDays,
     module: "events",
   },
   {
     label: "ข่าวประชาสัมพันธ์",
-    href: "#activity",
+    href: "/news",
     icon: Megaphone,
     module: "news",
   },
   {
     label: "คลังความรู้",
-    href: "#activity",
+    href: "/knowledge",
     icon: BookOpenText,
     module: "knowledge",
   },
   {
     label: "รายงาน",
-    href: "#module-overview",
+    href: "/reports",
     icon: MapPinned,
     module: "reports",
   },
@@ -104,6 +107,12 @@ export const navigationGroups = [
     href: "/settings/users",
     icon: Settings,
     module: "settings",
+    children: [
+      { label: "บัญชีของฉัน", href: "/settings/account", icon: KeyRound, module: "settings" },
+      { label: "ผู้ใช้และสิทธิ์", href: "/settings/users", icon: UsersRound, module: "settings" },
+      { label: "นำเข้าข้อมูล master", href: "/settings/master-import", icon: Database, module: "settings" },
+      { label: "นำเข้าข้อมูลระบบเดิม", href: "/settings/legacy-import", icon: DatabaseBackup, module: "settings" },
+    ],
   },
 ] as const;
 
@@ -247,11 +256,13 @@ export const upcomingItems = [
 ] as const;
 
 export const quickCreateItems = [
-  { label: "เพิ่ม MOU", icon: Handshake, module: "mou" },
-  { label: "เพิ่ม Mobility", icon: GraduationCap, module: "mobility" },
-  { label: "เพิ่มการเดินทาง", icon: Plane, module: "travel" },
+  { label: "เพิ่ม MOU", href: "/mou/new", icon: Handshake, module: "mou" },
+  { label: "เพิ่ม Mobility นิสิต", href: "/mobility/new", icon: GraduationCap, module: "mobility" },
+  { label: "เพิ่ม Mobility บุคลากร", href: "/staff-mobility/new", icon: UsersRound, module: "mobility" },
+  { label: "เพิ่มการเดินทาง", href: "/travel/new", icon: Plane, module: "travel" },
   {
     label: "เพิ่มผู้ติดต่อ",
+    href: "/mou/contacts/new",
     icon: ContactRound,
     module: "mou",
     internal: true,

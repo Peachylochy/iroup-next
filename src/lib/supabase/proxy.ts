@@ -5,10 +5,15 @@ const publicPaths = new Set(["/login", "/auth/callback"]);
 
 export async function updateSession(request: NextRequest) {
   let response = NextResponse.next({ request });
+  const supabaseUrl =
+    process.env.SUPABASE_URL ?? process.env.NEXT_PUBLIC_SUPABASE_URL!;
+  const supabasePublishableKey =
+    process.env.SUPABASE_PUBLISHABLE_KEY ??
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!;
 
   const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
+    supabaseUrl,
+    supabasePublishableKey,
     {
       cookies: {
         getAll() {
@@ -30,8 +35,13 @@ export async function updateSession(request: NextRequest) {
     },
   );
 
-  const { data } = await supabase.auth.getClaims();
-  const isSignedIn = Boolean(data?.claims?.sub);
+  // `getClaims()` only proves that the JWT is structurally valid. A browser can
+  // still hold such a token after its Auth user was removed (for example after
+  // a local reset), which previously caused an endless /login <-> / redirect.
+  // `getUser()` validates the session against Supabase Auth and lets the SSR
+  // client clear/refresh stale cookies through setAll above.
+  const { data, error } = await supabase.auth.getUser();
+  const isSignedIn = !error && Boolean(data.user);
   const pathname = request.nextUrl.pathname;
   const isDevelopmentPreview =
     process.env.NODE_ENV !== "production" && pathname === "/preview";

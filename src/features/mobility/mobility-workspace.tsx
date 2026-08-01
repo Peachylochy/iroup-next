@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, ArrowRight, Filter, GraduationCap, MapPin, Plus, UsersRound } from "lucide-react";
+import { ArrowLeft, ArrowRight, Filter, GraduationCap, Import, MapPin, Plus, UsersRound } from "lucide-react";
 import { WorkspaceChrome } from "@/components/app-shell/workspace-chrome";
 import { Badge } from "@/components/ui/badge";
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -23,7 +23,7 @@ export function MobilityWorkspace({ access, items, viewer }: Props) {
   }), [direction, items, query, status]);
   const pages = Math.max(1, Math.ceil(filtered.length / 10)); const current = Math.min(page, pages); const shown = filtered.slice((current - 1) * 10, current * 10);
   return <WorkspaceChrome access={access} viewer={viewer} title="การเดินทางและ Mobility" activePath="/mobility" query={query} onQueryChange={setQuery} searchPlaceholder="ค้นหาชื่อโครงการ องค์กร ประเทศ หรือหน่วยงาน">
-    <main className="module-main"><div className="module-page-heading"><div><p className="module-eyebrow">การเดินทางและ Mobility</p><h1>Mobility นิสิต</h1><p>จัดการโครงการแลกเปลี่ยน ตั้งแต่ร่าง ส่งตรวจ ติดตามการเดินทาง และสรุปผู้เข้าร่วม</p></div>{access.modules.mobility?.create ? <Link className={cn(buttonVariants({ size: "lg" }))} href="/mobility/new"><Plus data-icon="inline-start" /> เพิ่ม Mobility</Link> : null}</div>
+    <main className="module-main"><div className="module-page-heading"><div><p className="module-eyebrow">การเดินทางและ Mobility</p><h1>Mobility นิสิต</h1><p>จัดการโครงการแลกเปลี่ยน ตั้งแต่ร่าง ส่งตรวจ ติดตามการเดินทาง และสรุปผู้เข้าร่วม</p></div><div className="flex gap-2">{access.modules.mobility?.import ? <Link className={cn(buttonVariants({ variant: "outline", size: "lg" }))} href="/mobility/import"><Import data-icon="inline-start" /> ตรวจข้อมูลนำเข้า</Link> : null}{access.modules.mobility?.create ? <Link className={cn(buttonVariants({ size: "lg" }))} href="/mobility/new"><Plus data-icon="inline-start" /> เพิ่ม Mobility</Link> : null}</div></div>
       <div className="module-stat-strip"><div><span className="module-stat-icon"><GraduationCap /></span><span><strong>{items.length}</strong><small>โครงการทั้งหมด</small></span></div><div><span><strong>{items.filter((item) => item.workflow_status === "active").length}</strong><small>กำลังดำเนินการ</small></span></div><div><span><strong>{items.filter((item) => item.workflow_status === "under_review").length}</strong><small>รอตรวจสอบ</small></span></div></div>
       <section className="module-list-card"><div className="module-list-toolbar"><div><h2>รายการ Mobility นิสิต</h2><p>ข้อมูลภายในจาก Supabase · ไม่แสดงข้อมูลผู้เข้าร่วมใน Public Portal</p></div></div>
         <div className="module-filter-row"><Filter />{statuses.map(([value, label]) => <button className={cn("filter-pill", status === value && "is-selected")} key={value} onClick={() => { setStatus(value); setPage(1); }}>{label}</button>)}</div>

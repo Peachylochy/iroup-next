@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { ArrowLeft, CheckCircle2, FileCheck2, Plus, Save, Star, Trash2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { MasterSearchSelect } from "@/components/forms/master-search-select";
 import { Input } from "@/components/ui/input";
 import type { CurrentUserAccess } from "@/lib/auth/access";
 
@@ -58,20 +59,21 @@ function PartnerSelections({
   });
 
   return <div className="mou-relation-control">
-    <select
-      aria-label="เพิ่มองค์กรคู่ความร่วมมือ"
-      defaultValue=""
+    <MasterSearchSelect
+      value=""
       disabled={disabled || available.length === 0}
-      onChange={(event) => {
-        const id = event.target.value;
+      emptyLabel="ไม่พบองค์กรในคลังกลาง"
+      placeholder={available.length ? "ค้นหาองค์กรเพื่อเพิ่ม" : "เพิ่มองค์กรครบตามที่เลือกแล้ว"}
+      options={available.map((partner) => ({
+        value: partner.id,
+        label: partnerLabel(partner),
+        description: partner.countries ? `${partner.countries.name_th} (${partner.countries.name_en})` : "ยังไม่ระบุประเทศ",
+      }))}
+      onChange={(id) => {
         if (!id) return;
         onChange([...selections, { id, isLead: selections.length === 0 }]);
-        event.currentTarget.value = "";
       }}
-    >
-      <option value="">{available.length ? "เลือกองค์กรเพื่อเพิ่ม" : "เพิ่มองค์กรครบตามที่เลือกแล้ว"}</option>
-      {available.map((partner) => <option key={partner.id} value={partner.id}>{partnerLabel(partner)}</option>)}
-    </select>
+    />
     <div className="mou-relation-list" aria-live="polite">
       {selected.length ? selected.map(({ selection, partner }) => <div className="mou-relation-card" key={partner.id}>
         <div>
@@ -107,20 +109,21 @@ function UnitSelections({
   });
 
   return <div className="mou-relation-control">
-    <select
-      aria-label="เพิ่มหน่วยงาน ม.พะเยา"
-      defaultValue=""
+    <MasterSearchSelect
+      value=""
       disabled={disabled || available.length === 0}
-      onChange={(event) => {
-        const id = event.target.value;
+      emptyLabel="ไม่พบหน่วยงานในคลังกลาง"
+      placeholder={available.length ? "ค้นหาหน่วยงานเพื่อเพิ่ม" : "เพิ่มหน่วยงานครบตามที่เลือกแล้ว"}
+      options={available.map((unit) => ({
+        value: unit.id,
+        label: unit.name_th,
+        description: unit.name_en,
+      }))}
+      onChange={(id) => {
         if (!id) return;
         onChange([...selections, { id, isOwner: selections.length === 0 }]);
-        event.currentTarget.value = "";
       }}
-    >
-      <option value="">{available.length ? "เลือกหน่วยงานเพื่อเพิ่ม" : "เพิ่มหน่วยงานครบตามที่เลือกแล้ว"}</option>
-      {available.map((unit) => <option key={unit.id} value={unit.id}>{unit.name_th}</option>)}
-    </select>
+    />
     <div className="mou-relation-list" aria-live="polite">
       {selected.length ? selected.map(({ selection, unit }) => <div className="mou-relation-card" key={unit.id}>
         <div><strong>{unit.name_th}</strong><span>{selection.isOwner ? "หน่วยงานเจ้าของ" : "หน่วยงานเกี่ยวข้อง"}</span></div>

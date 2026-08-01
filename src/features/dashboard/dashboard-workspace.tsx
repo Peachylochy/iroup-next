@@ -9,6 +9,7 @@ import {
   ChevronDown,
   FileClock,
   FilePenLine,
+  KeyRound,
   LockKeyhole,
   LogOut,
   Menu,
@@ -31,8 +32,6 @@ import {
   moduleSummaries,
   priorityItems,
   quickCreateItems,
-  recentActivities,
-  upcomingItems,
 } from "./dashboard-data";
 import type { DashboardSnapshot } from "./dashboard-query";
 import type { MouAnalytics } from "./mou-analytics";
@@ -276,21 +275,31 @@ function formatThaiDate(value: string) {
   return new Intl.DateTimeFormat("th-TH", { day: "numeric", month: "short", year: "numeric" }).format(new Date(value));
 }
 
-function ActivityList({ liveMode = false }: { liveMode?: boolean }) {
+function formatActivityTime(value: string) {
+  return new Intl.DateTimeFormat("th-TH", {
+    day: "numeric",
+    month: "short",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(new Date(value));
+}
+
+function ActivityList({
+  items,
+}: {
+  items: DashboardSnapshot["recentActivities"];
+}) {
   return (
     <section className="lower-panel" id="activity">
       <SectionHeading>กิจกรรมล่าสุด</SectionHeading>
       <div className="activity-list">
-        {liveMode ? (
+        {items.length === 0 ? (
           <div className="search-empty">ยังไม่มีกิจกรรมในระบบ</div>
-        ) : recentActivities.map((item) => {
-          const Icon = item.icon;
+        ) : items.map((item) => {
           return (
-            <div className="activity-row" key={`${item.time}-${item.title}`}>
-              <time>{item.time}</time>
-              <span className="activity-icon" aria-hidden="true">
-                <Icon />
-              </span>
+            <Link className="activity-row" href={item.href} key={item.id}>
+              <time>{formatActivityTime(item.occurredAt)}</time>
+              <span className="activity-icon" aria-hidden="true"><FilePenLine /></span>
               <span className="activity-copy">
                 <strong>{item.title}</strong>
                 <small>{item.detail}</small>
@@ -301,7 +310,7 @@ function ActivityList({ liveMode = false }: { liveMode?: boolean }) {
                   <LockKeyhole aria-label="ข้อมูลภายใน" />
                 ) : null}
               </span>
-            </div>
+            </Link>
           );
         })}
       </div>
@@ -312,31 +321,31 @@ function ActivityList({ liveMode = false }: { liveMode?: boolean }) {
   );
 }
 
-function UpcomingList({ liveMode = false }: { liveMode?: boolean }) {
+function UpcomingList({
+  items,
+}: {
+  items: DashboardSnapshot["upcomingItems"];
+}) {
   return (
     <section className="lower-panel">
       <SectionHeading>กำหนดการใกล้ถึง</SectionHeading>
       <div className="upcoming-list">
-        {liveMode ? (
+        {items.length === 0 ? (
           <div className="search-empty">ยังไม่มีกำหนดการในระบบ</div>
-        ) : upcomingItems.map((item) => (
-          <div className="upcoming-row" key={`${item.day}-${item.title}`}>
+        ) : items.map((item) => {
+          const date = new Date(item.occursAt);
+          return <Link className="upcoming-row" href={item.href} key={item.id}>
             <time className="upcoming-date">
-              <strong>{item.day}</strong>
-              <small>{item.month}</small>
+              <strong>{new Intl.DateTimeFormat("th-TH", { day: "2-digit" }).format(date)}</strong>
+              <small>{new Intl.DateTimeFormat("th-TH", { month: "short" }).format(date)}</small>
             </time>
-            <time className="upcoming-time">{item.time}</time>
+            <time className="upcoming-time">{date.toLocaleTimeString("th-TH", { hour: "2-digit", minute: "2-digit" })}</time>
             <span className="upcoming-copy">
               <strong>{item.title}</strong>
-              <small>
-                {item.module}
-                {"internal" in item && item.internal ? (
-                  <LockKeyhole aria-label="ข้อมูลภายใน" />
-                ) : null}
-              </small>
+              <small>{item.module}</small>
             </span>
-          </div>
-        ))}
+          </Link>;
+        })}
       </div>
       <a className="panel-link" href="#priority-work">
         ดูทั้งหมด <ArrowRight aria-hidden="true" />
@@ -444,20 +453,40 @@ export function DashboardWorkspace({
               variant="ghost"
               size="icon"
               className="notification-button"
-              aria-label="การแจ้งเตือน 12 รายการ"
+              aria-label={`การแจ้งเตือน ${snapshot?.attentionCount ?? 0} รายการ`}
             >
               <Bell />
-              <span>12</span>
+              <span>{snapshot?.attentionCount ?? 0}</span>
             </Button>
             <Separator orientation="vertical" className="account-separator" />
             <div className="account">
-              <Avatar size="lg">
-                <AvatarFallback>{initials || "UP"}</AvatarFallback>
-              </Avatar>
-              <span>
-                <strong>{viewer.displayName}</strong>
-                <small>{viewer.role}</small>
-              </span>
+              {access ? (
+                <Link
+                  href="/settings/account"
+                  className="inline-flex items-center gap-2 rounded-lg px-1 py-0.5 transition-colors hover:bg-muted"
+                  aria-label="เปิดหน้าบัญชีและเปลี่ยนรหัสผ่าน"
+                  title="บัญชีของฉัน / เปลี่ยนรหัสผ่าน"
+                >
+                  <Avatar size="lg">
+                    <AvatarFallback>{initials || "UP"}</AvatarFallback>
+                  </Avatar>
+                  <span>
+                    <strong>{viewer.displayName}</strong>
+                    <small>{viewer.role}</small>
+                  </span>
+                  <KeyRound className="size-4 text-muted-foreground" />
+                </Link>
+              ) : (
+                <>
+                  <Avatar size="lg">
+                    <AvatarFallback>{initials || "UP"}</AvatarFallback>
+                  </Avatar>
+                  <span>
+                    <strong>{viewer.displayName}</strong>
+                    <small>{viewer.role}</small>
+                  </span>
+                </>
+              )}
               {access ? (
                 <form action={signOutAction}>
                   <Button
@@ -505,7 +534,8 @@ export function DashboardWorkspace({
                   {visibleQuickCreateItems.map((item) => {
                     const Icon = item.icon;
                     return (
-                      <button
+                      <Link
+                        href={item.href}
                         key={item.label}
                         onClick={() => setQuickAddOpen(false)}
                       >
@@ -514,7 +544,7 @@ export function DashboardWorkspace({
                         {"internal" in item && item.internal ? (
                           <LockKeyhole aria-label="ข้อมูลภายใน" />
                         ) : null}
-                      </button>
+                      </Link>
                     );
                   })}
                 </div>
@@ -527,8 +557,8 @@ export function DashboardWorkspace({
           <ModuleOverview access={access} snapshot={snapshot} />
           <MouAnalyticsOverview analytics={snapshot?.mouAnalytics} />
           <div className="lower-grid">
-            <ActivityList liveMode={Boolean(snapshot)} />
-            <UpcomingList liveMode={Boolean(snapshot)} />
+            <ActivityList items={snapshot?.recentActivities ?? []} />
+            <UpcomingList items={snapshot?.upcomingItems ?? []} />
           </div>
         </main>
       </div>

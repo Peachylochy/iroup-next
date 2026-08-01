@@ -1,9 +1,11 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import {
   Bell,
   ChevronDown,
+  KeyRound,
   LogOut,
   Menu,
   Search,
@@ -145,16 +147,26 @@ export function WorkspaceChrome({
                 <small>{viewer.role}</small>
               </span>
               {access ? (
-                <form action={signOutAction}>
-                  <Button
-                    type="submit"
-                    variant="ghost"
-                    size="icon"
-                    aria-label={`ออกจากระบบ ${viewer.email}`}
+                <>
+                  <Link
+                    href="/settings/account"
+                    className="inline-flex size-8 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                    aria-label="เปลี่ยนรหัสผ่าน"
+                    title="เปลี่ยนรหัสผ่าน"
                   >
-                    <LogOut />
-                  </Button>
-                </form>
+                    <KeyRound className="size-4" />
+                  </Link>
+                  <form action={signOutAction}>
+                    <Button
+                      type="submit"
+                      variant="ghost"
+                      size="icon"
+                      aria-label={`ออกจากระบบ ${viewer.email}`}
+                    >
+                      <LogOut />
+                    </Button>
+                  </form>
+                </>
               ) : (
                 <ChevronDown aria-hidden="true" />
               )}

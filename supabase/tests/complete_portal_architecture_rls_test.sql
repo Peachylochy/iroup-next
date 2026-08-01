@@ -35,7 +35,7 @@ select results_eq(
       and relkind = 'r'
       and relrowsecurity
   $$,
-  array[25::bigint],
+  array[26::bigint],
   'RLS is enabled on every public base table'
 );
 
@@ -484,7 +484,7 @@ select is_empty(
      where id = '32000000-0000-0000-0000-000000000004' $$,
   'Mobility editor cannot see official Travel drafts'
 );
-select lives_ok(
+select throws_ok(
   $$
     insert into public.movement_cases (
       project_name,
@@ -505,7 +505,9 @@ select lives_ok(
       '11000000-0000-0000-0000-000000000002'
     )
   $$,
-  'Mobility editor can create student mobility'
+  '42501',
+  null,
+  'Mobility editor must use the guarded student mobility RPC instead of direct writes'
 );
 select throws_ok(
   $$
