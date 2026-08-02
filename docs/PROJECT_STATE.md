@@ -2,10 +2,10 @@
 
 ## Current verified checkpoint — 2 August 2026
 
-The integration work is merged, deployed, and the legacy MOU and Contacts datasets are committed.
+The integration work is merged and deployed. Legacy MOU, Contacts, and Staff Travel datasets are committed to Supabase production.
 
 - GitHub branch: `main`
-- Current merged checkpoint: `65d5c4a` (PR [#13](https://github.com/Peachylochy/iroup-next/pull/13))
+- Current application checkpoint: `d4999c3` on `main` (PR [#13](https://github.com/Peachylochy/iroup-next/pull/13) is merged)
 - Feature/deploy commits: `6c7ccd7`, `2290719`, `640e1db`, and `65d5c4a`
 - Production deployment: `dpl_7L75jtg3vJG3M7EsZ6km6Tbcok2y`
 - Production URL: https://iroup-next.vercel.app
@@ -36,15 +36,23 @@ The integration work is merged, deployed, and the legacy MOU and Contacts datase
 - Contact data remains internal-only; browser readback passed on `/mou/contacts` and the edit form preserves multiple email values
 - Superseded unmerged staging batch `bbe6bc7c-0c30-4329-9dad-74db20eef907` was cancelled before commit
 
-Legacy Staff Travel remains a separate preview → staging/review → explicit-commit task.
+### Legacy Staff Travel production import — completed 2 August 2026
 
-อัปเดตล่าสุด: 30 กรกฎาคม 2569
-สถานะการทำงาน: **หยุดพักตามคำสั่งผู้ใช้ หลังจบ Local integration รอบ MOU, Contacts และ Travel**
+- Source: legacy public API plus `ForeignAffairs_25690726_112149.xlsx` (SHA-256 `A223616543AC850D9C75AB4DB4FE49932E19FBB784AECF7E4C37B8048A2FF17F`)
+- Production staging batch: `81427068-03d2-4663-95c3-5174b5f6b2b3`
+- Preview/review: 234 projects, 407 travelers, 404 linked to Data Master, 2 project-level snapshot warnings, 0 invalid
+- Atomic commit: completed; 234 imported rows have target movement record IDs
+- Production readback: 234 distinct travel projects and 407 participants; 404 participants link to `people.id` and 3 retain source-name snapshots
+- Data integrity: 0 missing country references, 0 invalid date order, 0 participant-count mismatches, and 0 orphan participants
+- Production browser readback passed on `/travel`, a representative travel detail page, and `/`; Dashboard displays 234 Staff Travel records
+- The corrected legacy journey period `8 July 2024 – 23 July 2024` is displayed on the Production travel list
+
+อัปเดตล่าสุด: 2 สิงหาคม 2569
+สถานะการทำงาน: **นำเข้า Legacy MOU, Contacts และ Staff Travel เข้า Production เสร็จและตรวจ readback แล้ว**
 Branch ปัจจุบัน: `main`
-HEAD ที่ push แล้ว: `65d5c4a fix: preserve multiple contact methods`
+Checkpoint แอปพลิเคชันก่อนอัปเดตเอกสาร: `d4999c3 docs: record legacy contacts production import`
 
-> ไฟล์นี้บันทึกสถานะจริง ณ จุดหยุดงาน งานหลัง `042015d` ยังเป็น local working tree
-> และยังไม่ได้ commit/push/deploy เพิ่ม ห้ามสรุปว่า production มีข้อมูลเท่ากับ local
+> สรุป Production ด้านบนเป็นสถานะอ้างอิงล่าสุด ส่วนหัวข้อ Local ด้านล่างเก็บหลักฐานการพัฒนาและการทดสอบก่อนนำเข้าจริง
 
 ## ภาพรวม
 
