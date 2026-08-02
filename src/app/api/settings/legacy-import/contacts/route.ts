@@ -65,7 +65,7 @@ export async function POST(request: Request) {
         valid_rows: preview.valid,
         warning_rows: preview.warning,
         invalid_rows: preview.invalid,
-        duplicate_rows: 0,
+        duplicate_rows: preview.duplicateRows,
         created_by: access.user_id,
       })
       .select("id")

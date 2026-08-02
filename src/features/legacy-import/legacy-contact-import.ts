@@ -11,6 +11,24 @@ type ExistingContact = {
   full_name: string;
 };
 
+type ContactMethod = {
+  method_type: "email" | "phone";
+  value: string;
+};
+
+type NormalizedContactData = {
+  partnerOrganizationId: string | null;
+  fullName: string;
+  positionTitle: string;
+  department: string;
+  expertiseAreas: string[];
+  relationshipLevel: "unrated" | "low" | "medium" | "high";
+  preferredLanguage: string;
+  internalNote: string;
+  lastContactedOn: string;
+  contactMethods: ContactMethod[];
+};
+
 export type LegacyContactPreviewRow = {
   rowNumber: number;
   sourceKey: string;
@@ -20,18 +38,7 @@ export type LegacyContactPreviewRow = {
   organizationName: string;
   messages: string[];
   sourceData: Record<string, string | number | null>;
-  normalizedData: {
-    partnerOrganizationId: string | null;
-    fullName: string;
-    positionTitle: string;
-    department: string;
-    expertiseAreas: string[];
-    relationshipLevel: "unrated" | "low" | "medium" | "high";
-    preferredLanguage: string;
-    internalNote: string;
-    lastContactedOn: string;
-    contactMethods: Array<{ method_type: "email" | "phone"; value: string }>;
-  };
+  normalizedData: NormalizedContactData;
 };
 
 export type LegacyContactPreview = {
@@ -42,6 +49,7 @@ export type LegacyContactPreview = {
   invalid: number;
   inserts: number;
   updates: number;
+  duplicateRows: number;
   rows: LegacyContactPreviewRow[];
 };
 
@@ -90,10 +98,115 @@ function relationshipLevel(value: string) {
 }
 
 function methods(email: string, phone: string) {
-  const result: Array<{ method_type: "email" | "phone"; value: string }> = [];
+  const result: ContactMethod[] = [];
   if (email.trim()) result.push({ method_type: "email", value: email.trim() });
   if (phone.trim()) result.push({ method_type: "phone", value: phone.trim() });
   return result;
+}
+
+function uniqueStrings(values: string[]) {
+  const seen = new Set<string>();
+  return values.filter((value) => {
+    const normalized = value.trim();
+    if (!normalized) return false;
+    const key = normalizeName(normalized);
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
+function mergeContactMethods(groups: ContactMethod[][]) {
+  const seen = new Set<string>();
+  const result: ContactMethod[] = [];
+  for (const method of groups.flat()) {
+    const value = method.value.trim();
+    const key = `${method.method_type}:${value.toLocaleLowerCase("en")}`;
+    if (!value || seen.has(key)) continue;
+    seen.add(key);
+    result.push({ method_type: method.method_type, value });
+  }
+  return result;
+}
+
+function mergeTextBlocks(values: string[]) {
+  return uniqueStrings(values.flatMap((value) => value.split("\n"))).join("\n");
+}
+
+function mergeDuplicateContactRows(rows: LegacyContactPreviewRow[]) {
+  const groups = new Map<string, LegacyContactPreviewRow[]>();
+  for (const row of rows) {
+    const partnerId = row.normalizedData.partnerOrganizationId;
+    const nameKey = normalizeName(row.normalizedData.fullName);
+    const key = partnerId && nameKey ? `${partnerId}:${nameKey}` : `source:${row.sourceKey}`;
+    const group = groups.get(key) || [];
+    group.push(row);
+    groups.set(key, group);
+  }
+
+  let duplicateRows = 0;
+  const mergedRows = [...groups.values()].map((group) => {
+    if (group.length === 1) return group[0];
+    duplicateRows += group.length - 1;
+    const first = group[0];
+    const mergedMethods = mergeContactMethods(
+      group.map((row) => row.normalizedData.contactMethods),
+    );
+    const mergedNotes = mergeTextBlocks(
+      group.map((row) => row.normalizedData.internalNote),
+    );
+    const mergedExpertise = uniqueStrings(
+      group.flatMap((row) => row.normalizedData.expertiseAreas),
+    );
+    const lastContactedOn = group
+      .map((row) => row.normalizedData.lastContactedOn)
+      .filter(Boolean)
+      .sort()
+      .at(-1) || "";
+    const relationshipLevel =
+      group.find((row) => row.normalizedData.relationshipLevel === "high")?.normalizedData
+        .relationshipLevel ||
+      group.find((row) => row.normalizedData.relationshipLevel === "medium")?.normalizedData
+        .relationshipLevel ||
+      group.find((row) => row.normalizedData.relationshipLevel === "low")?.normalizedData
+        .relationshipLevel ||
+      "unrated";
+    const sourceRows = group.map((row) => row.sourceKey).join(", ");
+    const emailValues = mergedMethods
+      .filter((method) => method.method_type === "email")
+      .map((method) => method.value);
+    const phoneValues = mergedMethods
+      .filter((method) => method.method_type === "phone")
+      .map((method) => method.value);
+
+    return {
+      ...first,
+      sourceKey: sourceRows,
+      messages: uniqueStrings(group.flatMap((row) => row.messages)),
+      sourceData: {
+        ...first.sourceData,
+        email: emailValues.join("; "),
+        phone: phoneValues.join("; "),
+        note: mergeTextBlocks(group.map((row) => String(row.sourceData.note || ""))),
+        source_rows: sourceRows,
+      },
+      normalizedData: {
+        ...first.normalizedData,
+        positionTitle:
+          group.map((row) => row.normalizedData.positionTitle).find(Boolean) || "",
+        department: group.map((row) => row.normalizedData.department).find(Boolean) || "",
+        expertiseAreas: mergedExpertise,
+        relationshipLevel,
+        preferredLanguage:
+          group.map((row) => row.normalizedData.preferredLanguage).find(Boolean) || "",
+        internalNote: mergedNotes,
+        lastContactedOn,
+        contactMethods: mergedMethods,
+      },
+    };
+  });
+
+  return { rows: mergedRows, duplicateRows };
 }
 
 export async function previewLegacyContactImport(
@@ -204,14 +317,21 @@ export async function previewLegacyContactImport(
     });
   }
 
+  const merged = mergeDuplicateContactRows(rows);
+  const normalizedRows = merged.rows.map((row, index) => ({
+    ...row,
+    rowNumber: index + 1,
+  }));
+
   return {
     sourceFile: file.name,
-    total: rows.length,
-    valid: rows.filter((row) => row.status === "valid").length,
-    warning: rows.filter((row) => row.status === "warning").length,
-    invalid: rows.filter((row) => row.status === "invalid").length,
-    inserts: rows.filter((row) => row.changeAction === "insert").length,
-    updates: rows.filter((row) => row.changeAction === "update").length,
-    rows,
+    total: normalizedRows.length,
+    valid: normalizedRows.filter((row) => row.status === "valid").length,
+    warning: normalizedRows.filter((row) => row.status === "warning").length,
+    invalid: normalizedRows.filter((row) => row.status === "invalid").length,
+    inserts: normalizedRows.filter((row) => row.changeAction === "insert").length,
+    updates: normalizedRows.filter((row) => row.changeAction === "update").length,
+    duplicateRows: merged.duplicateRows,
+    rows: normalizedRows,
   };
 }
