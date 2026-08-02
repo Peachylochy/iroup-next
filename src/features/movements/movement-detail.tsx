@@ -162,7 +162,7 @@ export function StaffMovementDetail({
         {movement.movement_participants.length ? (
           <div className="mou-list">
             {movement.movement_participants.map((participant) => (
-              <article className="mou-row" key={participant.id}>
+              <article className="mou-row movement-participant-row" key={participant.id}>
                 <div className="mou-row-main">
                   <div className="mou-row-title">
                     <strong>{participant.full_name_snapshot}</strong>

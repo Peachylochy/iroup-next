@@ -2004,6 +2004,42 @@
   }
 }
 
+.mou-row.movement-participant-row {
+  display: block;
+  padding: 16px 20px;
+}
+
+.movement-participant-row .mou-row-main {
+  width: 100%;
+}
+
+.movement-participant-row .mou-row-title {
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 10px;
+}
+
+.movement-participant-row .mou-row-title strong {
+  overflow: visible;
+  font-size: 13px;
+  line-height: 1.45;
+  text-overflow: clip;
+  white-space: normal;
+}
+
+.movement-participant-row .mou-row-title small {
+  flex: none;
+  font-size: 10px;
+}
+
+.movement-participant-row .mou-row-main p {
+  overflow: visible;
+  font-size: 10px;
+  line-height: 1.45;
+  text-overflow: clip;
+  white-space: normal;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
