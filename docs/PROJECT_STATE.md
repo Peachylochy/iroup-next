@@ -1,27 +1,47 @@
 # iROUP Next: Project State
 
-## Current verified checkpoint — 1 August 2026
+## Current verified checkpoint — 2 August 2026
 
-The local integration work is now pushed and deployed.
+The integration work is merged, deployed, and the legacy MOU and Contacts datasets are committed.
 
-- GitHub branch: `agent/student-mobility-import-preview`
-- Latest feature/deploy commit: `2290719 chore: exclude local dev logs from deploy`
-- Feature commit: `6c7ccd7 feat: connect portal modules and import workflows`
-- Draft PR: [#13](https://github.com/Peachylochy/iroup-next/pull/13)
-- Production deployment: `dpl_5XXRp6UWXPqBLzRZeNzTTW38u9ao`
+- GitHub branch: `main`
+- Current merged checkpoint: `65d5c4a` (PR [#13](https://github.com/Peachylochy/iroup-next/pull/13))
+- Feature/deploy commits: `6c7ccd7`, `2290719`, `640e1db`, and `65d5c4a`
+- Production deployment: `dpl_7L75jtg3vJG3M7EsZ6km6Tbcok2y`
 - Production URL: https://iroup-next.vercel.app
 - Supabase production migrations through `20260730210000` are applied and verified
 - Production RPC/function readback passed for mobility, staff movement, MOU, contacts, and legacy import commit paths
-- Local checks passed: `pnpm.cmd typecheck`, `pnpm.cmd test` (4/4), `pnpm.cmd lint`, and `pnpm.cmd build`
+- Local checks passed: `pnpm.cmd typecheck`, `pnpm.cmd test` (5/5), and `pnpm.cmd lint`; Vercel production build passed
 - Production HTTP smoke checks passed: `/login` returned 200; protected `/mou` redirected to login
 - Local-only `assets/` and `.codex-dev*.log` are excluded from GitHub/Vercel
 
-Production currently contains master data but no committed legacy MOU, contact, or travel transaction records yet. Those imports remain a separate staging/review/explicit-commit step.
+### Legacy MOU production import — completed 1 August 2026
+
+- Source: legacy public API `v2.public.mou.list`
+- Production staging batch: `f9705482-b5e5-4bec-9dcc-7ce9b5f320ce`
+- Staging review: 54 rows, 54 approved, 0 invalid, 12 warnings for new partner creation
+- Atomic commit: completed; 54 imported rows have target record IDs
+- Production readback: 54 MOU (35 active, 19 expired), 54 lead-partner links, 54 owner-unit links
+- Data integrity: 54 distinct legacy IDs, 0 missing partner/unit links, 0 bad date order, 0 workflow/publication mismatches
+- Partner organizations: 64 total; this batch created 11 distinct new organizations
+- Production browser readback passed on `/mou` and `/`: list, filters, status counts, owner-unit analytics, country analytics, and recent activity all use the committed data
+
+### Legacy Contacts production import — completed 2 August 2026
+
+- Source: `Contact_องค์กรต่างประเทศ_v5.xlsx` (SHA-256 `FCB0DBCBDF1E752838A8E29DD50EE6465F62E43F659EB83F42E7A6D01F9BCAC8`)
+- Final staging batch: `7f7cb4c5-ace0-4738-a36a-f6e968a38075`
+- Staging review: 55 rows, 53 valid, 2 warnings for missing email/phone, 0 invalid, 3 duplicate source rows merged
+- Atomic commit: completed; 55 imported rows have target record IDs
+- Production readback: 55 active contacts, 62 active contact methods, 0 contacts without partner organization, 0 duplicate partner/name contacts
+- Contact data remains internal-only; browser readback passed on `/mou/contacts` and the edit form preserves multiple email values
+- Superseded unmerged staging batch `bbe6bc7c-0c30-4329-9dad-74db20eef907` was cancelled before commit
+
+Legacy Staff Travel remains a separate preview → staging/review → explicit-commit task.
 
 อัปเดตล่าสุด: 30 กรกฎาคม 2569
 สถานะการทำงาน: **หยุดพักตามคำสั่งผู้ใช้ หลังจบ Local integration รอบ MOU, Contacts และ Travel**
-Branch ปัจจุบัน: `agent/student-mobility-import-preview`
-HEAD ที่ push แล้ว: `042015d fix: make account settings easy to reach`
+Branch ปัจจุบัน: `main`
+HEAD ที่ push แล้ว: `65d5c4a fix: preserve multiple contact methods`
 
 > ไฟล์นี้บันทึกสถานะจริง ณ จุดหยุดงาน งานหลัง `042015d` ยังเป็น local working tree
 > และยังไม่ได้ commit/push/deploy เพิ่ม ห้ามสรุปว่า production มีข้อมูลเท่ากับ local
@@ -189,18 +209,21 @@ Local Supabase มี migration/function เหล่านี้แล้วต
 
 ## Production State
 
-ยืนยันก่อนรอบปัจจุบัน:
+ยืนยัน ณ 2 สิงหาคม 2569:
 
 - Supabase production ref: `fefxzaxlfocqeuicjevv`
 - Vercel URL: `https://iroup-next.vercel.app`
 - `thratip.so@up.ac.th` เป็น production System Admin
 - Production master seed มี countries/units/partners/people แล้ว
+- Migrations ถึง `20260730210000` ตรงกันทั้ง local และ Production
+- Legacy MOU batch `f9705482-b5e5-4bec-9dcc-7ce9b5f320ce` commit สำเร็จ 54 รายการ
+- Legacy Contacts batch `7f7cb4c5-ace0-4738-a36a-f6e968a38075` commit สำเร็จ 55 ผู้ติดต่อ และ 62 ช่องทางติดต่อ
+- Dashboard และหน้า `/mou` อ่านข้อมูล MOU Production จริงครบแล้ว
+- หน้า `/mou/contacts` อ่าน Contacts Production จริงและแสดงหลายช่องทางติดต่อครบแล้ว
 
-ยังไม่ยืนยันหรือยังไม่ทำในรอบปัจจุบัน:
+ยังไม่ทำใน Production:
 
-- Migrations ที่อยู่ใน working tree ด้านบนยังไม่ยืนยันว่า apply production
-- Legacy MOU/Contacts/Travel รอบนี้ยังไม่ได้นำเข้า production
-- Dashboard improvements รอบนี้ยังไม่ push/deploy
+- Legacy Staff Travel ยังไม่ได้นำเข้า
 - ห้ามนำ QA records จาก local ขึ้น production
 
 ## QA Data ที่ต้องล้างก่อน Production
@@ -221,9 +244,9 @@ Local Supabase มี migration/function เหล่านี้แล้วต
 4. ทำ pgTAP เพิ่มสำหรับ legacy MOU/contact/travel commit functions
 5. รัน `typecheck`, unit tests, ESLint, build, pgTAP และ browser regression
 6. ล้าง local QA data หลัง inventory
-7. ตรวจ production migration list แล้ว apply migrations ตามลำดับ
-8. นำ legacy data ขึ้น production ผ่าน staging/review/explicit commit
-9. push GitHub, deploy Vercel และตรวจ production readback/browser
+7. ก่อน migration รอบใหม่ให้ตรวจ production migration list ซ้ำ; ปัจจุบันตรงกันถึง `20260730210000`
+8. นำ Legacy Staff Travel ขึ้น Production ผ่าน staging/review/explicit commit (Legacy MOU และ Contacts เสร็จแล้ว)
+9. push เอกสาร checkpoint รอบ Contacts; deploy ใหม่เฉพาะเมื่อมี code change
 10. SharePoint integration ทำหลัง CITCOMS อนุมัติ Graph API เท่านั้น
 
 ## จุดเริ่มงานครั้งถัดไป
@@ -231,17 +254,16 @@ Local Supabase มี migration/function เหล่านี้แล้วต
 เริ่มจาก:
 
 1. `git status --short` และห้าม stage `assets/` หรือ `.codex-dev*.log`
-2. `pnpm typecheck`
-3. Browser QA ต่อจาก `/scholarships/new` โดย submit QA record แล้ว readback
-4. ทำ Event → News → Knowledge ตามลำดับ และลบ QA records หลังผ่าน
-5. ตรวจ/fix master pagination ใน query ที่อาจโตเกิน 1,000 rows
-6. เริ่ม Public Portal หลัง internal CRUD/browser QA ผ่านครบ
+2. commit/push เฉพาะ `docs/PROJECT_STATE.md` ของ checkpoint นี้
+3. นำ Legacy Staff Travel ผ่าน preview → staging → ตรวจ 234 projects/407 participants → explicit commit
+5. กลับมาทำ browser QA Scholarship → Event → News → Knowledge และลบ QA records หลังผ่าน
+6. ตรวจ/fix master pagination ใน query ที่อาจโตเกิน 1,000 rows แล้วเริ่ม Public Portal หลัง internal QA ผ่านครบ
 
 ## Git และไฟล์ที่ห้ามพลาด
 
 - Repository: `Peachylochy/iroup-next`
-- Branch: `agent/student-mobility-import-preview`
-- Last pushed commit: `042015d`
+- Branch: `main`
+- Last pushed commit: `65d5c4a`
 - Working tree มีการเปลี่ยนแปลงจำนวนมากจาก Mobility, content modules,
   legacy import, dashboard, reports และ migrations
 - ยังไม่ commit/push ตามคำสั่ง “หยุดก่อน”
