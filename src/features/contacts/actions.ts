@@ -16,6 +16,14 @@ const value = (formData: FormData, name: string) => {
   return typeof item === "string" ? item.trim() : "";
 };
 
+const values = (formData: FormData, name: string) =>
+  formData
+    .getAll(name)
+    .filter((item): item is string => typeof item === "string")
+    .flatMap((item) => item.split(/[;\n]/))
+    .map((item) => item.trim())
+    .filter(Boolean);
+
 function contactError(error: { message: string; details?: string | null }) {
   if (error.message.includes("PARTNER_CONTACT_VALIDATION_FAILED")) {
     return error.details || "กรุณากรอกชื่อผู้ติดต่อและองค์กร";
@@ -35,10 +43,25 @@ export async function savePartnerContact(
 ): Promise<ContactFormState> {
   const supabase = await createClient();
   const methods = [
-    { method_type: "email", value: value(formData, "email"), label: "อีเมล", is_primary: true },
-    { method_type: "phone", value: value(formData, "phone"), label: "โทรศัพท์", is_primary: true },
-    { method_type: "messaging", value: value(formData, "messaging"), label: "ช่องทางแชต", is_primary: true },
-  ].filter((method) => method.value);
+    ...values(formData, "email").map((item, index) => ({
+      method_type: "email",
+      value: item,
+      label: "อีเมล",
+      is_primary: index === 0,
+    })),
+    ...values(formData, "phone").map((item, index) => ({
+      method_type: "phone",
+      value: item,
+      label: "โทรศัพท์",
+      is_primary: index === 0,
+    })),
+    ...values(formData, "messaging").map((item, index) => ({
+      method_type: "messaging",
+      value: item,
+      label: "ช่องทางแชต",
+      is_primary: index === 0,
+    })),
+  ];
 
   const { data, error } = await supabase.rpc("partner_contact_save", {
     target_contact_id: value(formData, "contact_id") || null,

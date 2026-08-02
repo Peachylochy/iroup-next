@@ -75,8 +75,8 @@ export function ContactWorkspace({ access, contacts, viewer }: Props) {
           {shown.length ? (
             <div className="mou-list">
               {shown.map((contact) => {
-                const email = contact.partner_contact_methods.find((method) => method.method_type === "email");
-                const phone = contact.partner_contact_methods.find((method) => method.method_type === "phone");
+                const emails = contact.partner_contact_methods.filter((method) => method.method_type === "email");
+                const phones = contact.partner_contact_methods.filter((method) => method.method_type === "phone");
                 const organization = contact.partner_organizations?.name_th || contact.partner_organizations?.name_en || "ยังไม่ระบุองค์กร";
                 const country = contact.partner_organizations?.countries?.name_th || contact.partner_organizations?.countries?.name_en;
                 return (
@@ -89,8 +89,8 @@ export function ContactWorkspace({ access, contacts, viewer }: Props) {
                       </div>
                       <p>{organization}{country ? ` · ${country}` : ""}</p>
                       <p className="flex flex-wrap gap-3">
-                        {email ? <span><Mail /> {email.value}</span> : null}
-                        {phone ? <span><Phone /> {phone.value}</span> : null}
+                        {emails.map((email) => <span key={email.id}><Mail /> {email.value}</span>)}
+                        {phones.map((phone) => <span key={phone.id}><Phone /> {phone.value}</span>)}
                       </p>
                     </div>
                     <Badge className="mou-status">{relationshipLabel[contact.relationship_level]}</Badge>

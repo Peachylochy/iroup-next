@@ -20,7 +20,10 @@ type Props = {
 };
 
 function methodValue(contact: PartnerContact | null, type: string) {
-  return contact?.partner_contact_methods.find((method) => method.method_type === type)?.value || "";
+  return contact?.partner_contact_methods
+    .filter((method) => method.method_type === type)
+    .map((method) => method.value)
+    .join("; ") || "";
 }
 
 export function ContactForm({ contact, options }: Props) {
@@ -72,8 +75,8 @@ export function ContactForm({ contact, options }: Props) {
         <section className="mou-form-section">
           <div className="mou-form-section-heading"><span>2</span><div><h2>ช่องทางติดต่อ</h2><p>ข้อมูลภายในและค้นหาได้จากหน้ารายการ</p></div></div>
           <div className="mou-form-grid">
-            <label className="mou-field">อีเมล<Input name="email" type="email" defaultValue={methodValue(contact, "email")} /></label>
-            <label className="mou-field">โทรศัพท์<Input name="phone" defaultValue={methodValue(contact, "phone")} /></label>
+            <label className="mou-field">อีเมล<Input name="email" type="text" defaultValue={methodValue(contact, "email")} placeholder="คั่นหลายค่าโดยใช้ ;" /></label>
+            <label className="mou-field">โทรศัพท์<Input name="phone" defaultValue={methodValue(contact, "phone")} placeholder="คั่นหลายค่าโดยใช้ ;" /></label>
             <label className="mou-field">ช่องทางแชต<Input name="messaging" defaultValue={methodValue(contact, "messaging")} placeholder="LINE / WeChat / WhatsApp" /></label>
             <label className="mou-field">ภาษาที่สะดวก<Input name="preferred_language" defaultValue={contact?.preferred_language || ""} /></label>
           </div>
