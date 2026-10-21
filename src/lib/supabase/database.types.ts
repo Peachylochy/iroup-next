@@ -299,44 +299,71 @@ export type Database = {
         Row: {
           alt_text_en: string | null
           alt_text_th: string | null
+          attribution: string | null
           created_at: string
           created_by: string
           file_role_id: string | null
+          height: number | null
           id: string
           is_public: boolean
           mime_type: string | null
+          origin_url: string | null
           original_file_name: string
+          rights_basis: string | null
+          rights_note: string | null
+          sha256: string | null
           size_bytes: number | null
+          source_kind: string | null
           storage_bucket: string
           storage_path: string
+          uploaded_sha256: string | null
+          width: number | null
         }
         Insert: {
           alt_text_en?: string | null
           alt_text_th?: string | null
+          attribution?: string | null
           created_at?: string
           created_by: string
           file_role_id?: string | null
+          height?: number | null
           id?: string
           is_public?: boolean
           mime_type?: string | null
+          origin_url?: string | null
           original_file_name: string
+          rights_basis?: string | null
+          rights_note?: string | null
+          sha256?: string | null
           size_bytes?: number | null
+          source_kind?: string | null
           storage_bucket: string
           storage_path: string
+          uploaded_sha256?: string | null
+          width?: number | null
         }
         Update: {
           alt_text_en?: string | null
           alt_text_th?: string | null
+          attribution?: string | null
           created_at?: string
           created_by?: string
           file_role_id?: string | null
+          height?: number | null
           id?: string
           is_public?: boolean
           mime_type?: string | null
+          origin_url?: string | null
           original_file_name?: string
+          rights_basis?: string | null
+          rights_note?: string | null
+          sha256?: string | null
           size_bytes?: number | null
+          source_kind?: string | null
           storage_bucket?: string
           storage_path?: string
+          uploaded_sha256?: string | null
+          width?: number | null
         }
         Relationships: [
           {
@@ -390,6 +417,143 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      content_asset_sets: {
+        Row: {
+          based_on_id: string | null
+          brief_id: string
+          created_at: string
+          created_by: string
+          digest: string
+          id: string
+          revision: number
+          slots: Json
+          version_number: number
+          work_item_id: string
+        }
+        Insert: {
+          based_on_id?: string | null
+          brief_id: string
+          created_at?: string
+          created_by: string
+          digest: string
+          id?: string
+          revision: number
+          slots: Json
+          version_number: number
+          work_item_id: string
+        }
+        Update: {
+          based_on_id?: string | null
+          brief_id?: string
+          created_at?: string
+          created_by?: string
+          digest?: string
+          id?: string
+          revision?: number
+          slots?: Json
+          version_number?: number
+          work_item_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "content_asset_sets_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "content_asset_sets_work_item_id_based_on_id_fkey"
+            columns: ["work_item_id", "based_on_id"]
+            isOneToOne: false
+            referencedRelation: "content_asset_sets"
+            referencedColumns: ["work_item_id", "id"]
+          },
+          {
+            foreignKeyName: "content_asset_sets_work_item_id_brief_id_fkey"
+            columns: ["work_item_id", "brief_id"]
+            isOneToOne: false
+            referencedRelation: "visual_brief_versions"
+            referencedColumns: ["work_item_id", "id"]
+          },
+          {
+            foreignKeyName: "content_asset_sets_work_item_id_fkey"
+            columns: ["work_item_id"]
+            isOneToOne: false
+            referencedRelation: "content_work_items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      content_manual_assets: {
+        Row: {
+          asset_id: string
+          brief_id: string
+          created_at: string
+          created_by: string
+          parent_asset_id: string | null
+          revision: number
+          upload_id: string
+          work_item_id: string
+        }
+        Insert: {
+          asset_id: string
+          brief_id: string
+          created_at?: string
+          created_by: string
+          parent_asset_id?: string | null
+          revision: number
+          upload_id: string
+          work_item_id: string
+        }
+        Update: {
+          asset_id?: string
+          brief_id?: string
+          created_at?: string
+          created_by?: string
+          parent_asset_id?: string | null
+          revision?: number
+          upload_id?: string
+          work_item_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "content_manual_assets_asset_id_fkey"
+            columns: ["asset_id"]
+            isOneToOne: true
+            referencedRelation: "assets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "content_manual_assets_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "content_manual_assets_work_item_id_brief_id_fkey"
+            columns: ["work_item_id", "brief_id"]
+            isOneToOne: false
+            referencedRelation: "visual_brief_versions"
+            referencedColumns: ["work_item_id", "id"]
+          },
+          {
+            foreignKeyName: "content_manual_assets_work_item_id_fkey"
+            columns: ["work_item_id"]
+            isOneToOne: false
+            referencedRelation: "content_work_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "content_manual_assets_work_item_id_parent_asset_id_fkey"
+            columns: ["work_item_id", "parent_asset_id"]
+            isOneToOne: false
+            referencedRelation: "content_manual_assets"
+            referencedColumns: ["work_item_id", "asset_id"]
+          },
+        ]
       }
       content_review_decisions: {
         Row: {
@@ -643,6 +807,74 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "content_snapshots"
             referencedColumns: ["work_item_id", "id"]
+          },
+        ]
+      }
+      content_visual_reviews: {
+        Row: {
+          asset_set_id: string | null
+          brief_id: string | null
+          created_at: string
+          created_by: string
+          decision: string
+          id: string
+          note: string
+          revision: number
+          target_kind: string
+          work_item_id: string
+        }
+        Insert: {
+          asset_set_id?: string | null
+          brief_id?: string | null
+          created_at?: string
+          created_by: string
+          decision: string
+          id?: string
+          note?: string
+          revision: number
+          target_kind: string
+          work_item_id: string
+        }
+        Update: {
+          asset_set_id?: string | null
+          brief_id?: string | null
+          created_at?: string
+          created_by?: string
+          decision?: string
+          id?: string
+          note?: string
+          revision?: number
+          target_kind?: string
+          work_item_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "content_visual_reviews_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "content_visual_reviews_work_item_id_asset_set_id_fkey"
+            columns: ["work_item_id", "asset_set_id"]
+            isOneToOne: false
+            referencedRelation: "content_asset_sets"
+            referencedColumns: ["work_item_id", "id"]
+          },
+          {
+            foreignKeyName: "content_visual_reviews_work_item_id_brief_id_fkey"
+            columns: ["work_item_id", "brief_id"]
+            isOneToOne: false
+            referencedRelation: "visual_brief_versions"
+            referencedColumns: ["work_item_id", "id"]
+          },
+          {
+            foreignKeyName: "content_visual_reviews_work_item_id_fkey"
+            columns: ["work_item_id"]
+            isOneToOne: false
+            referencedRelation: "content_work_items"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -2488,6 +2720,74 @@ export type Database = {
           },
         ]
       }
+      visual_brief_versions: {
+        Row: {
+          based_on_id: string | null
+          brief: Json
+          content_version_id: string
+          created_at: string
+          created_by: string
+          digest: string
+          id: string
+          revision: number
+          version_number: number
+          work_item_id: string
+        }
+        Insert: {
+          based_on_id?: string | null
+          brief: Json
+          content_version_id: string
+          created_at?: string
+          created_by: string
+          digest: string
+          id?: string
+          revision: number
+          version_number: number
+          work_item_id: string
+        }
+        Update: {
+          based_on_id?: string | null
+          brief?: Json
+          content_version_id?: string
+          created_at?: string
+          created_by?: string
+          digest?: string
+          id?: string
+          revision?: number
+          version_number?: number
+          work_item_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "visual_brief_versions_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "visual_brief_versions_work_item_id_based_on_id_fkey"
+            columns: ["work_item_id", "based_on_id"]
+            isOneToOne: false
+            referencedRelation: "visual_brief_versions"
+            referencedColumns: ["work_item_id", "id"]
+          },
+          {
+            foreignKeyName: "visual_brief_versions_work_item_id_content_version_id_fkey"
+            columns: ["work_item_id", "content_version_id"]
+            isOneToOne: false
+            referencedRelation: "content_versions"
+            referencedColumns: ["work_item_id", "id"]
+          },
+          {
+            foreignKeyName: "visual_brief_versions_work_item_id_fkey"
+            columns: ["work_item_id"]
+            isOneToOne: false
+            referencedRelation: "content_work_items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       agreements_public: {
@@ -2883,6 +3183,19 @@ export type Database = {
       }
       content_core_list: {
         Args: { p_kind: string; p_page?: number }
+        Returns: Json
+      }
+      content_visual_asset_file: {
+        Args: { p_actor_id: string; p_asset_id: string }
+        Returns: Json
+      }
+      content_visual_execute: { Args: { p_command: Json }; Returns: Json }
+      content_visual_finalize_upload: {
+        Args: { p_actor_id: string; p_upload_id: string; p_verified: Json }
+        Returns: Json
+      }
+      content_visual_inspect: {
+        Args: { p_work_item_id: string }
         Returns: Json
       }
       current_user_access: { Args: never; Returns: Json }

@@ -2,10 +2,12 @@ import { createClient } from "@/lib/supabase/server";
 import type { Database } from "@/lib/supabase/database.types";
 import { commandSchema, commandResultSchema, detailSchema, listSchema } from "./schema";
 import type { ContentCommand, ContentKind } from "./types";
+import { ContentVisual } from "@/features/content-visual/server";
 
 // One server-side boundary for editorial commands and safe, bounded read models.
-// Provider, upload and publication adapters are intentionally absent in this slice.
+// Visual work and manual image ingestion share this application boundary.
 export const ContentProduction = {
+  visual: ContentVisual,
   async execute(command: ContentCommand) {
     const validated = commandSchema.parse(command);
     const client = await createClient();
