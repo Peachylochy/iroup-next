@@ -555,6 +555,128 @@ export type Database = {
           },
         ]
       }
+      content_publication_bundles: {
+        Row: {
+          asset_set_digest: string
+          asset_set_id: string
+          based_on_id: string | null
+          brief_digest: string
+          brief_id: string
+          canonicalization: string
+          channel: string
+          content_digest: string
+          content_version_id: string
+          created_at: string
+          created_by: string
+          digest: string
+          hash_algorithm: string
+          id: string
+          payload: Json
+          revision: number
+          schema_version: number
+          snapshot_digest: string
+          snapshot_id: string
+          version_number: number
+          work_item_id: string
+        }
+        Insert: {
+          asset_set_digest: string
+          asset_set_id: string
+          based_on_id?: string | null
+          brief_digest: string
+          brief_id: string
+          canonicalization?: string
+          channel: string
+          content_digest: string
+          content_version_id: string
+          created_at?: string
+          created_by: string
+          digest: string
+          hash_algorithm?: string
+          id?: string
+          payload: Json
+          revision: number
+          schema_version?: number
+          snapshot_digest: string
+          snapshot_id: string
+          version_number: number
+          work_item_id: string
+        }
+        Update: {
+          asset_set_digest?: string
+          asset_set_id?: string
+          based_on_id?: string | null
+          brief_digest?: string
+          brief_id?: string
+          canonicalization?: string
+          channel?: string
+          content_digest?: string
+          content_version_id?: string
+          created_at?: string
+          created_by?: string
+          digest?: string
+          hash_algorithm?: string
+          id?: string
+          payload?: Json
+          revision?: number
+          schema_version?: number
+          snapshot_digest?: string
+          snapshot_id?: string
+          version_number?: number
+          work_item_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "content_publication_bundles_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "content_publication_bundles_work_item_id_asset_set_id_fkey"
+            columns: ["work_item_id", "asset_set_id"]
+            isOneToOne: true
+            referencedRelation: "content_asset_sets"
+            referencedColumns: ["work_item_id", "id"]
+          },
+          {
+            foreignKeyName: "content_publication_bundles_work_item_id_brief_id_fkey"
+            columns: ["work_item_id", "brief_id"]
+            isOneToOne: false
+            referencedRelation: "visual_brief_versions"
+            referencedColumns: ["work_item_id", "id"]
+          },
+          {
+            foreignKeyName: "content_publication_bundles_work_item_id_channel_based_on__fkey"
+            columns: ["work_item_id", "channel", "based_on_id"]
+            isOneToOne: false
+            referencedRelation: "content_publication_bundles"
+            referencedColumns: ["work_item_id", "channel", "id"]
+          },
+          {
+            foreignKeyName: "content_publication_bundles_work_item_id_content_version_i_fkey"
+            columns: ["work_item_id", "content_version_id"]
+            isOneToOne: false
+            referencedRelation: "content_versions"
+            referencedColumns: ["work_item_id", "id"]
+          },
+          {
+            foreignKeyName: "content_publication_bundles_work_item_id_fkey"
+            columns: ["work_item_id"]
+            isOneToOne: false
+            referencedRelation: "content_work_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "content_publication_bundles_work_item_id_snapshot_id_fkey"
+            columns: ["work_item_id", "snapshot_id"]
+            isOneToOne: false
+            referencedRelation: "content_snapshots"
+            referencedColumns: ["work_item_id", "id"]
+          },
+        ]
+      }
       content_review_decisions: {
         Row: {
           created_at: string
@@ -3183,6 +3305,11 @@ export type Database = {
       }
       content_core_list: {
         Args: { p_kind: string; p_page?: number }
+        Returns: Json
+      }
+      content_publication_execute: { Args: { p_command: Json }; Returns: Json }
+      content_publication_inspect: {
+        Args: { p_bundle_id?: string; p_work_item_id: string }
         Returns: Json
       }
       content_visual_asset_file: {
