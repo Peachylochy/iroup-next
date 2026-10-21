@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { importCommitErrorMessage } from "@/lib/import-commit-error";
 import { z } from "zod";
 
 import { getCurrentUserAccess } from "@/lib/auth/access";
@@ -29,6 +30,6 @@ export async function POST(
   const { data, error } = await supabase.rpc("commit_legacy_contact_import_batch", {
     target_batch_id: batchId,
   });
-  if (error) return NextResponse.json({ error: error.message }, { status: 400 });
+  if (error) return NextResponse.json({ error: importCommitErrorMessage(error.message) }, { status: 400 });
   return NextResponse.json({ result: data });
 }

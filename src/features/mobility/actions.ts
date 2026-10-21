@@ -12,7 +12,7 @@ const text = (data: FormData, name: string) => {
 };
 
 function parseArray(data: FormData, name: string) {
-  try { const parsed: unknown = JSON.parse(text(data, name)); return Array.isArray(parsed) ? parsed : []; } catch { return []; }
+  try { const parsed: unknown = JSON.parse(text(data, name)); return Array.isArray(parsed) ? parsed : null; } catch { return null; }
 }
 
 function mobilityError(error: { message: string; details?: string | null }) {
@@ -24,6 +24,11 @@ function mobilityError(error: { message: string; details?: string | null }) {
 }
 
 export async function submitMobilityForm(_previous: MobilityFormState, formData: FormData): Promise<MobilityFormState> {
+  const participants = parseArray(formData, "participants_json");
+  const funding = parseArray(formData, "funding_json");
+  if (participants === null || funding === null) {
+    return { error: "รูปแบบข้อมูลผู้เดินทางหรืองบประมาณไม่ถูกต้อง กรุณารีเฟรชหน้าแล้วลองอีกครั้ง" };
+  }
   const supabase = await createClient();
   const id = text(formData, "mobility_id") || null;
   const updatedAt = text(formData, "updated_at") || null;
@@ -37,26 +42,19 @@ export async function submitMobilityForm(_previous: MobilityFormState, formData:
     approval_reference: text(formData, "approval_reference"), start_date: startDate, end_date: text(formData, "end_date"),
     departure_at: text(formData, "departure_at"), return_at: text(formData, "return_at"), fiscal_year: fiscalYear, internal_note: text(formData, "internal_note"),
   };
-  const { data: savedData, error: saveError } = await supabase.rpc("student_mobility_save_draft", { target_movement_id: id, expected_updated_at: updatedAt, payload });
+  const submitForReview = text(formData, "intent") === "review";
+  const { data: savedData, error: saveError } = await supabase.rpc("student_mobility_save", {
+    target_movement_id: id,
+    expected_updated_at: updatedAt,
+    payload,
+    participants,
+    funding,
+    submit_for_review: submitForReview,
+  });
   if (saveError) return { error: mobilityError(saveError) };
   const saved = savedData as { id: string; updated_at: string };
-  const participants = parseArray(formData, "participants_json");
-  const funding = parseArray(formData, "funding_json");
-  let currentUpdatedAt = saved.updated_at;
-  const participantResult = await supabase.rpc("student_mobility_replace_participants", { target_movement_id: saved.id, expected_updated_at: currentUpdatedAt, participants });
-  if (participantResult.error) return { error: mobilityError(participantResult.error) };
-  currentUpdatedAt = (participantResult.data as { updated_at: string }).updated_at;
-  const fundingResult = await supabase.rpc("student_mobility_replace_funding", { target_movement_id: saved.id, expected_updated_at: currentUpdatedAt, funding });
-  if (fundingResult.error) return { error: mobilityError(fundingResult.error) };
-  currentUpdatedAt = (fundingResult.data as { updated_at: string }).updated_at;
-  if (text(formData, "intent") === "review") {
-    const reviewResult = await supabase.rpc("student_mobility_submit_for_review", { target_movement_id: saved.id, expected_updated_at: currentUpdatedAt });
-    if (reviewResult.error) return { error: mobilityError(reviewResult.error) };
-    currentUpdatedAt = (reviewResult.data as { updated_at: string }).updated_at;
-    revalidatePath("/mobility"); revalidatePath(`/mobility/${saved.id}`); return { success: "review", id: saved.id, updatedAt: currentUpdatedAt };
-  }
   revalidatePath("/mobility"); revalidatePath(`/mobility/${saved.id}`); revalidatePath(`/mobility/${saved.id}/edit`);
-  return { success: "draft", id: saved.id, updatedAt: currentUpdatedAt };
+  return { success: submitForReview ? "review" : "draft", id: saved.id, updatedAt: saved.updated_at };
 }
 
 export type MobilityTransition = "return_to_draft" | "approve" | "activate" | "complete";

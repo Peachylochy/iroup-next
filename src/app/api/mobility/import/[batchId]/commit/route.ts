@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { importCommitErrorMessage } from "@/lib/import-commit-error";
 import { z } from "zod";
 
 import { getCurrentUserAccess } from "@/lib/auth/access";
@@ -25,7 +26,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ bat
       STUDENT_MOBILITY_IMPORT_NOT_READY: "batch นี้นำเข้าแล้วหรือยังไม่พร้อม",
       STUDENT_MOBILITY_IMPORT_FORBIDDEN: "ไม่มีสิทธิ์นำเข้าข้อมูล Mobility",
     };
-    const message = Object.entries(messages).find(([key]) => error.message.includes(key))?.[1] ?? error.message;
+    const message = Object.entries(messages).find(([key]) => error.message.includes(key))?.[1] ?? importCommitErrorMessage(error.message);
     return NextResponse.json({ error: message }, { status: error.code === "42501" ? 403 : 400 });
   }
   return NextResponse.json({ result: data });

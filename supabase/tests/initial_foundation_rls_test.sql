@@ -426,6 +426,11 @@ select results_eq(
     select count(*)::bigint
     from private.audit_logs
     where table_name = 'movement_cases'
+      and record_id in (
+        '40000000-0000-0000-0000-000000000001',
+        '40000000-0000-0000-0000-000000000002',
+        '40000000-0000-0000-0000-000000000003'
+      )
   $$,
   array[5::bigint],
   'Official Travel inserts and updates are audited'

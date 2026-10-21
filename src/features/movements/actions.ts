@@ -22,9 +22,9 @@ const text = (formData: FormData, name: string) => {
 function parseArray(formData: FormData, name: string) {
   try {
     const parsed: unknown = JSON.parse(text(formData, name));
-    return Array.isArray(parsed) ? parsed : [];
+    return Array.isArray(parsed) ? parsed : null;
   } catch {
-    return [];
+    return null;
   }
 }
 
@@ -51,6 +51,12 @@ export async function saveStaffMovement(
   const movementModule = text(formData, "movement_module") as StaffMovementModule;
   const config = staffMovementModules[movementModule];
   if (!config) return { error: "ไม่พบโมดูลการเดินทาง" };
+
+  const participants = parseArray(formData, "participants_json");
+  const funding = parseArray(formData, "funding_json");
+  if (participants === null || funding === null) {
+    return { error: "รูปแบบข้อมูลผู้เดินทางหรืองบประมาณไม่ถูกต้อง กรุณารีเฟรชหน้าแล้วลองอีกครั้ง" };
+  }
 
   const startDate = text(formData, "start_date");
   const payload = {
@@ -79,8 +85,8 @@ export async function saveStaffMovement(
     expected_updated_at: text(formData, "updated_at") || null,
     requested_category: config.category,
     payload,
-    participants: parseArray(formData, "participants_json"),
-    funding: parseArray(formData, "funding_json"),
+    participants,
+    funding,
     submit_for_review: text(formData, "intent") === "review",
   });
   if (error) return { error: message(error) };

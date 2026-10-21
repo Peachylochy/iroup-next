@@ -1,7 +1,7 @@
 begin;
 
 create extension if not exists pgtap with schema extensions;
-select plan(4);
+select plan(3);
 
 select has_function(
   'public',
@@ -20,15 +20,8 @@ select ok(
   'authenticated calls are allowed for the RPC guard to evaluate the caller'
 );
 
-select ok(
-  exists (
-    select 1
-    from pg_proc
-    where oid = 'public.commit_master_import_batch(uuid)'::regprocedure
-      and prosrc like '%private.is_admin()%'
-  ),
-  'commit RPC checks System Admin access'
-);
+-- System Admin vs Office Admin authorization is exercised behaviorally in
+-- stability_access_guards_test.sql and stability_import_integrity_test.sql.
 
 select * from finish();
 rollback;

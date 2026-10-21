@@ -30,7 +30,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ batc
     .eq("id", batchId).eq("import_kind", "master_data").single();
   if (batchError || !batch) return NextResponse.json({ error: "ไม่พบ staging batch นี้" }, { status: 404 });
 
-  let rowsQuery = supabase.from("import_rows").select("id, row_number, status, master_entity, source_key, change_action, review_status, review_note, source_data, normalized_data, validation_messages", { count: "exact" }).eq("batch_id", batchId).order("row_number");
+  let rowsQuery = supabase.from("import_rows").select("id, row_number, status, master_entity, source_key, change_action, review_status, review_note, source_data, normalized_data, validation_messages, target_record_id", { count: "exact" }).eq("batch_id", batchId).order("row_number");
   // Existing keys are normal upserts for a master-data import. Only invalid
   // rows need an officer's action before the batch is ready to commit.
   if (filter === "issues") rowsQuery = rowsQuery.eq("status", "invalid").in("review_status", ["pending", "needs_fix"]);
@@ -71,6 +71,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ ba
 
   const update: Record<string, unknown> = { review_status: payload.decision, review_note: payload.reviewNote || null, reviewed_at: new Date().toISOString(), reviewed_by: access.user_id };
   if (payload.decision === "skipped") update.change_action = "skip";
+  if (payload.decision === "approved" && row.change_action === "skip") update.change_action = row.status === "warning" ? "update" : "insert";
   if (payload.decision === "approved" && row.status === "invalid") { update.status = "valid"; update.change_action = "insert"; update.validation_messages = []; update.normalized_data = normalized; }
   if (payload.decision === "approved" && row.status !== "invalid") update.normalized_data = normalized;
   const { data, error } = await supabase.from("import_rows").update(update).eq("id", row.id).select("id, status, review_status, change_action").single();

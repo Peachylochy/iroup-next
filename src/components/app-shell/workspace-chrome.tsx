@@ -33,6 +33,7 @@ type WorkspaceChromeProps = {
   query?: string;
   onQueryChange?: (query: string) => void;
   searchPlaceholder?: string;
+  hidePlaceholderControls?: boolean;
   children: React.ReactNode;
 };
 
@@ -55,6 +56,7 @@ export function WorkspaceChrome({
   query = "",
   onQueryChange,
   searchPlaceholder = "ค้นหาข้อมูล",
+  hidePlaceholderControls = false,
   children,
 }: WorkspaceChromeProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -107,14 +109,16 @@ export function WorkspaceChrome({
             <strong>{title}</strong>
           </div>
           <div className="topbar-actions">
-            <label className="fiscal-select">
-              <span className="sr-only">เลือกปีงบประมาณ</span>
-              <select defaultValue="2569">
-                <option value="2569">ปีงบประมาณ 2569</option>
-                <option value="2570">ปีงบประมาณ 2570</option>
-              </select>
-              <ChevronDown aria-hidden="true" />
-            </label>
+            {!hidePlaceholderControls ? (
+              <label className="fiscal-select">
+                <span className="sr-only">เลือกปีงบประมาณ</span>
+                <select defaultValue="2569">
+                  <option value="2569">ปีงบประมาณ 2569</option>
+                  <option value="2570">ปีงบประมาณ 2570</option>
+                </select>
+                <ChevronDown aria-hidden="true" />
+              </label>
+            ) : null}
             {onQueryChange ? (
               <label className="search-control">
                 <Search aria-hidden="true" />
@@ -128,15 +132,17 @@ export function WorkspaceChrome({
                 <kbd>⌘K</kbd>
               </label>
             ) : null}
-            <Button
-              variant="ghost"
-              size="icon"
-              className="notification-button"
-              aria-label="การแจ้งเตือน 12 รายการ"
-            >
-              <Bell />
-              <span>12</span>
-            </Button>
+            {!hidePlaceholderControls ? (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="notification-button"
+                aria-label="การแจ้งเตือน 12 รายการ"
+              >
+                <Bell />
+                <span>12</span>
+              </Button>
+            ) : null}
             <Separator orientation="vertical" className="account-separator" />
             <div className="account">
               <Avatar size="lg">

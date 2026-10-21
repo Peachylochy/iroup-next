@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getCurrentUserAccess } from "@/lib/auth/access";
 import { createClient } from "@/lib/supabase/server";
 import { masterEntities, previewMasterImport, type MasterEntity, type MasterPreviewRow } from "@/features/master-import/master-import-preview";
+import { readAllMasterRows } from "@/features/master-import/read-all-master-rows";
 
 export const runtime = "nodejs";
 const chunk = <T,>(items: T[], size: number) => Array.from({ length: Math.ceil(items.length / size) }, (_, index) => items.slice(index * size, index * size + size));
@@ -9,10 +10,12 @@ const chunk = <T,>(items: T[], size: number) => Array.from({ length: Math.ceil(i
 async function getExisting() {
   const supabase = await createClient();
   const [countries, units, partners, people] = await Promise.all([
-    supabase.from("countries").select("iso2"), supabase.from("organization_units").select("code"), supabase.from("partner_organizations").select("legacy_id"), supabase.from("people").select("person_type, source_identifier").not("source_identifier", "is", null),
+    readAllMasterRows((from, to) => supabase.from("countries").select("iso2").order("id").range(from, to)),
+    readAllMasterRows((from, to) => supabase.from("organization_units").select("code").order("id").range(from, to)),
+    readAllMasterRows((from, to) => supabase.from("partner_organizations").select("legacy_id").order("id").range(from, to)),
+    readAllMasterRows((from, to) => supabase.from("people").select("person_type, source_identifier").not("source_identifier", "is", null).order("id").range(from, to)),
   ]);
-  if (countries.error || units.error || partners.error || people.error) throw new Error("อ่านข้อมูล master ปัจจุบันไม่สำเร็จ");
-  return { countries: new Set(countries.data.map((row) => row.iso2)), units: new Set(units.data.flatMap((row) => row.code ? [row.code] : [])), partners: new Set(partners.data.flatMap((row) => row.legacy_id ? [row.legacy_id] : [])), students: new Set(people.data.filter((row) => row.person_type === "student").map((row) => row.source_identifier!)), staff: new Set(people.data.filter((row) => row.person_type === "staff").map((row) => row.source_identifier!)) };
+  return { countries: new Set(countries.map((row) => row.iso2)), units: new Set(units.flatMap((row) => row.code ? [row.code] : [])), partners: new Set(partners.flatMap((row) => row.legacy_id ? [row.legacy_id] : [])), students: new Set(people.filter((row) => row.person_type === "student").map((row) => row.source_identifier!)), staff: new Set(people.filter((row) => row.person_type === "staff").map((row) => row.source_identifier!)) };
 }
 
 export async function POST(request: Request) {
