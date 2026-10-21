@@ -33,9 +33,9 @@ select results_eq(
     from pg_class
     where relnamespace = 'public'::regnamespace
       and relkind = 'r'
-      and relrowsecurity
+      and not relrowsecurity
   $$,
-  array[26::bigint],
+  array[0::bigint],
   'RLS is enabled on every public base table'
 );
 

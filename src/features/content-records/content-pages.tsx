@@ -42,6 +42,7 @@ export async function NewContentPage({
 }: {
   module: ContentModule;
 }) {
+  if (module === "scholarship" || module === "news") redirect(`/content-production/${module}/new`);
   const access = await getCurrentUserAccess();
   if (!access) redirect("/login");
   if (!hasWorkspaceAccess(access) || !access.modules[module]?.create) redirect("/");
@@ -62,6 +63,7 @@ export async function EditContentPage({
   module: ContentModule;
   id: string;
 }) {
+  if (module === "scholarship" || module === "news") redirect(`/content-production/${module}/${id}`);
   const access = await getCurrentUserAccess();
   if (!access) redirect("/login");
   if (!hasWorkspaceAccess(access) || !access.modules[module]?.update) redirect("/");

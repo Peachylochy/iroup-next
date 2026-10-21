@@ -50,6 +50,9 @@ export function ContentWorkspace({
           <div><p className="module-eyebrow">การเผยแพร่และข้อมูลบริการ</p><h1>{config.title}</h1><p>{config.description}</p></div>
           {access.modules[config.module]?.create ? <Link className={cn(buttonVariants({ size: "lg" }))} href={`${config.route}/new`}><Plus /> เพิ่ม{config.itemLabel}</Link> : null}
         </div>
+        {module === "scholarship" || module === "news" ? (
+          <p><Link className={cn(buttonVariants({ variant: "outline" }))} href={`/content-production?kind=${module}`}>จัดทำและตรวจเนื้อหา</Link></p>
+        ) : null}
         <section className="module-list-card">
           <div className="module-list-toolbar"><div><h2>รายการ{config.title}</h2><p>ข้อมูลจาก Supabase · แยกสถานะร่างและเผยแพร่</p></div><Badge variant="outline">{shown.length} รายการ</Badge></div>
           {shown.length ? <div className="mou-list">{shown.map((record) => (

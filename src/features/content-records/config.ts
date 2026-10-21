@@ -45,5 +45,5 @@ export const contentModules: Record<ContentModule, {
 };
 
 export function isContentModule(value: string): value is ContentModule {
-  return value in contentModules;
+  return Object.hasOwn(contentModules, value);
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ChevronDown, ChevronLeft, LockKeyhole } from "lucide-react";
+import { ChevronDown, ChevronLeft, FilePenLine, LockKeyhole } from "lucide-react";
 
 import type { CurrentUserAccess, ModuleKey } from "@/lib/auth/access";
 import { cn } from "@/lib/utils";
@@ -39,6 +39,12 @@ export function SidebarContent({
     <div className="sidebar-content">
       <Brand />
       <nav className="sidebar-nav" aria-label="เมนูหลัก">
+        {access && (access.modules.scholarship?.view || access.modules.news?.view) ? (
+          <Link className={cn("nav-item", activePath.startsWith("/content-production") && "nav-item-active")}
+            href={`/content-production?kind=${access.modules.scholarship?.view ? "scholarship" : "news"}`} onClick={onNavigate}>
+            <FilePenLine aria-hidden="true" /><span>จัดทำเนื้อหา</span>
+          </Link>
+        ) : null}
         {navigationGroups.map((item) => {
           const visibleChildren =
             "children" in item

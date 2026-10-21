@@ -21,6 +21,9 @@ export async function saveContentRecord(
 ): Promise<ContentFormState> {
   const moduleValue = value(formData, "content_module");
   if (!isContentModule(moduleValue)) return { error: "ไม่พบโมดูลที่ต้องการบันทึก" };
+  if (moduleValue === "scholarship" || moduleValue === "news") {
+    return { error: "กรุณาเปิดหน้าจัดทำเนื้อหาเพื่อบันทึกฉบับใหม่และส่งตรวจ" };
+  }
   const config = contentModules[moduleValue];
   const access = await getCurrentUserAccess();
   if (!access) return { error: "กรุณาเข้าสู่ระบบใหม่" };
@@ -38,24 +41,7 @@ export async function saveContentRecord(
   if (!common.title_th) return { error: "กรุณาระบุชื่อภาษาไทย" };
 
   let payload: Record<string, unknown>;
-  if (moduleValue === "scholarship") {
-    payload = {
-      ...common,
-      scholarship_type: nullable(formData, "scholarship_type"),
-      funding_type: nullable(formData, "funding_type"),
-      study_level: nullable(formData, "study_level"),
-      audience: value(formData, "audience") || "student",
-      partner_organization_id: nullable(formData, "partner_organization_id"),
-      country_id: nullable(formData, "country_id"),
-      publish_date: nullable(formData, "publish_date"),
-      open_date: nullable(formData, "open_date"),
-      close_date: nullable(formData, "close_date"),
-      summary_th: nullable(formData, "summary_th"),
-      content_th: nullable(formData, "content_th"),
-      detail_url: nullable(formData, "detail_url"),
-      apply_url: nullable(formData, "apply_url"),
-    };
-  } else if (moduleValue === "events") {
+  if (moduleValue === "events") {
     const startsAt = nullable(formData, "starts_at");
     const endsAt = nullable(formData, "ends_at");
     if (!startsAt || !endsAt) return { error: "กรุณาระบุวันและเวลาเริ่ม-สิ้นสุด" };
@@ -72,14 +58,6 @@ export async function saveContentRecord(
       registration_url: nullable(formData, "registration_url"),
       detail_th: nullable(formData, "content_th"),
       participant_count: Number(value(formData, "participant_count")) || 0,
-    };
-  } else if (moduleValue === "news") {
-    payload = {
-      ...common,
-      category: nullable(formData, "category"),
-      summary_th: nullable(formData, "summary_th"),
-      content_th: nullable(formData, "content_th"),
-      published_at: nullable(formData, "published_at"),
     };
   } else {
     payload = {
